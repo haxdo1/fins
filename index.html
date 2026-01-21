@@ -15,7 +15,7 @@
   <div class="mb-8 text-center">
     <h1 class="text-3xl font-bold text-white">Activity Report BBCode Generator</h1>
     <p class="text-slate-400 mt-2">
-      Reimbursement and Proposal are standalone reports
+      Reimbursement & Proposal Standalone Report Generator
     </p>
   </div>
 
@@ -66,58 +66,78 @@
 </div>
 
 <script>
-/* ================= WEEK RANGE ================= */
-function getMonthWeekRange(date = new Date()) {
+/* ===== WEEK RANGE ===== */
+function getWeekRange(date = new Date()) {
   const start = (date.getMonth() * 5) + 1;
-  return { start, end: start + 4 };
+  return {
+    start,
+    end: start + 4,
+    month: date.toLocaleString('en-US', { month: 'long' })
+  };
 }
 
-/* ================= HELPERS ================= */
-function item(url, label) {
-  return url ? `[*][url=${url}]${label}[/url]\n` : '';
+/* ===== HELPERS ===== */
+function bbItem(url, text) {
+  return url ? `[*][url=${url}]${text}[/url]\n` : '';
 }
 
-function createCard(type, index) {
-  return `
-  <div class="bg-slate-800 border border-slate-700 rounded-xl p-5">
-    <h3 class="font-semibold mb-3">${type} #${index}</h3>
-    <input class="w-full mb-2 p-2 rounded bg-slate-900 border border-slate-700 received" placeholder="Received URL">
-    <input class="w-full mb-2 p-2 rounded bg-slate-900 border border-slate-700 accepted" placeholder="Accepted URL">
-    <input class="w-full p-2 rounded bg-slate-900 border border-slate-700 fund" placeholder="Fund Has Been Given URL">
-  </div>`;
-}
-
-/* ================= ADD CARD ================= */
+/* ===== CARD TEMPLATES ===== */
 let reimCount = 0, propCount = 0;
 
 function addReim() {
   reimCount++;
-  reimContainer.insertAdjacentHTML('beforeend', createCard('Reimbursement', reimCount));
+  reimContainer.insertAdjacentHTML('beforeend', `
+  <div class="bg-slate-800 border border-slate-700 rounded-xl p-5">
+    <h3 class="font-semibold mb-3">Reimbursement #${reimCount}</h3>
+    <input class="w-full mb-2 p-2 rounded bg-slate-900 border border-slate-700 person"
+      placeholder="Reimbursement Name (e.g. Ismail Rothschild)">
+    <input class="w-full mb-2 p-2 rounded bg-slate-900 border border-slate-700 received" placeholder="Received URL">
+    <input class="w-full mb-2 p-2 rounded bg-slate-900 border border-slate-700 accepted" placeholder="Accepted URL">
+    <input class="w-full p-2 rounded bg-slate-900 border border-slate-700 fund" placeholder="Funds Have Been Given URL">
+  </div>`);
 }
 
 function addProp() {
   propCount++;
-  propContainer.insertAdjacentHTML('beforeend', createCard('Proposal', propCount));
+  propContainer.insertAdjacentHTML('beforeend', `
+  <div class="bg-slate-800 border border-slate-700 rounded-xl p-5">
+    <h3 class="font-semibold mb-3">Proposal #${propCount}</h3>
+    <input class="w-full mb-2 p-2 rounded bg-slate-900 border border-slate-700 manager"
+      placeholder="Manager Name (e.g. Jason Sullivan)">
+    <input class="w-full mb-2 p-2 rounded bg-slate-900 border border-slate-700 type"
+      placeholder="Proposal Type (e.g. CC Salary March 2025)">
+    <input class="w-full mb-2 p-2 rounded bg-slate-900 border border-slate-700 received" placeholder="Receive URL">
+    <input class="w-full mb-2 p-2 rounded bg-slate-900 border border-slate-700 accepted" placeholder="Accepted URL">
+    <input class="w-full p-2 rounded bg-slate-900 border border-slate-700 fund" placeholder="Funds Have Been Given URL">
+  </div>`);
 }
 
-/* ================= GENERATE ================= */
+/* ===== GENERATE ===== */
 function generateBBCode() {
-  const week = getMonthWeekRange();
+  const week = getWeekRange();
+  let reimText = '', propText = '';
 
-  let reimbursement = '';
   document.querySelectorAll('#reimContainer > div').forEach(card => {
-    reimbursement +=
-      item(card.querySelector('.received').value, 'Received Reimbursement') +
-      item(card.querySelector('.accepted').value, 'Accepted Reimbursement') +
-      item(card.querySelector('.fund').value, 'Fund Has Been Given');
+    const name = card.querySelector('.person').value || 'Unknown';
+    reimText +=
+      bbItem(card.querySelector('.received').value,
+        `[RECEIVED] Reimbursement ${name} (Week ${week.start} / ${week.month})`) +
+      bbItem(card.querySelector('.accepted').value,
+        `[ACCEPTED] Reimbursement ${name} (Week ${week.start} / ${week.month})`) +
+      bbItem(card.querySelector('.fund').value,
+        `[FUNDS HAVE BEEN GIVEN] Reimbursement ${name} (Week ${week.start} / ${week.month})`);
   });
 
-  let proposal = '';
   document.querySelectorAll('#propContainer > div').forEach(card => {
-    proposal +=
-      item(card.querySelector('.received').value, 'Received Proposal') +
-      item(card.querySelector('.accepted').value, 'Accepted Proposal') +
-      item(card.querySelector('.fund').value, 'Fund Has Been Given');
+    const manager = card.querySelector('.manager').value || 'Unknown';
+    const type = card.querySelector('.type').value || 'Proposal';
+    propText +=
+      bbItem(card.querySelector('.received').value,
+        `[PROPOSAL] Manager ${manager} - ${type} - RECEIVE`) +
+      bbItem(card.querySelector('.accepted').value,
+        `[PROPOSAL] Manager ${manager} - ${type} - ACCEPTED`) +
+      bbItem(card.querySelector('.fund').value,
+        `[PROPOSAL] Manager ${manager} - ${type} - FUNDS HAVE BEEN GIVEN`);
   });
 
   output.value = `[divbox=darkblue][divbox=white]
@@ -133,18 +153,18 @@ function generateBBCode() {
 [b]Report:[/b]
 [secspoiler=Reimbursement]
 [list=1]
-${reimbursement || '[*]No reimbursement activity'}
+${reimText || '[*]No reimbursement activity'}
 [/list]
 [/secspoiler]
 
 [secspoiler=Proposal]
 [list=1]
-${proposal || '[*]No proposal activity'}
+${propText || '[*]No proposal activity'}
 [/list]
 [/secspoiler]`;
 }
 
-/* ================= COPY ================= */
+/* ===== COPY ===== */
 function copyBBCode() {
   if (!output.value) return;
   navigator.clipboard.writeText(output.value);
