@@ -14,7 +14,9 @@
   <!-- HEADER -->
   <div class="mb-8 text-center">
     <h1 class="text-3xl font-bold text-white">Activity Report BBCode Generator</h1>
-    <p class="text-slate-400 mt-2">Each card equals one activity report</p>
+    <p class="text-slate-400 mt-2">
+      Reimbursement and Proposal are standalone reports
+    </p>
   </div>
 
   <!-- IDENTITY -->
@@ -26,15 +28,29 @@
     </div>
   </div>
 
-  <!-- REPORT CARDS -->
-  <div id="reportContainer" class="space-y-6"></div>
+  <!-- REIMBURSEMENT -->
+  <div class="mb-8">
+    <div class="flex justify-between items-center mb-3">
+      <h2 class="text-xl font-semibold">Reimbursement Reports</h2>
+      <button onclick="addReim()" class="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded">
+        ➕ Add Reimbursement
+      </button>
+    </div>
+    <div id="reimContainer" class="space-y-4"></div>
+  </div>
 
-  <!-- ADD CARD -->
-  <button onclick="addCard()" class="w-full bg-indigo-600 hover:bg-indigo-700 p-3 rounded-lg font-semibold mb-6">
-    ➕ Add Report Card
-  </button>
+  <!-- PROPOSAL -->
+  <div class="mb-8">
+    <div class="flex justify-between items-center mb-3">
+      <h2 class="text-xl font-semibold">Proposal Reports</h2>
+      <button onclick="addProp()" class="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded">
+        ➕ Add Proposal
+      </button>
+    </div>
+    <div id="propContainer" class="space-y-4"></div>
+  </div>
 
-  <!-- ACTIONS -->
+  <!-- ACTION -->
   <div class="flex gap-4 mb-6">
     <button onclick="generateBBCode()" class="flex-1 bg-blue-600 hover:bg-blue-700 p-3 rounded-lg font-semibold">
       Generate BBCode
@@ -50,59 +66,58 @@
 </div>
 
 <script>
-let cardCount = 0;
-
-/* WEEK RANGE */
+/* ================= WEEK RANGE ================= */
 function getMonthWeekRange(date = new Date()) {
   const start = (date.getMonth() * 5) + 1;
   return { start, end: start + 4 };
 }
 
-/* ADD CARD */
-function addCard() {
-  cardCount++;
-  const card = document.createElement('div');
-  card.className = "bg-slate-800 border border-slate-700 rounded-xl p-6";
-  card.innerHTML = `
-    <h3 class="text-lg font-semibold mb-4">Report #${cardCount}</h3>
-
-    <p class="text-sm text-slate-400 mb-2">Reimbursement</p>
-    <input class="w-full mb-2 p-2 rounded bg-slate-900 border border-slate-700 reim-r" placeholder="Received URL">
-    <input class="w-full mb-2 p-2 rounded bg-slate-900 border border-slate-700 reim-a" placeholder="Accepted URL">
-    <input class="w-full mb-4 p-2 rounded bg-slate-900 border border-slate-700 reim-f" placeholder="Fund Given URL">
-
-    <p class="text-sm text-slate-400 mb-2">Proposal</p>
-    <input class="w-full mb-2 p-2 rounded bg-slate-900 border border-slate-700 prop-r" placeholder="Received URL">
-    <input class="w-full mb-2 p-2 rounded bg-slate-900 border border-slate-700 prop-a" placeholder="Accepted URL">
-    <input class="w-full p-2 rounded bg-slate-900 border border-slate-700 prop-f" placeholder="Fund Given URL">
-  `;
-  document.getElementById('reportContainer').appendChild(card);
+/* ================= HELPERS ================= */
+function item(url, label) {
+  return url ? `[*][url=${url}]${label}[/url]\n` : '';
 }
 
-/* ITEM */
-function item(url, text) {
-  return url ? `[*][url=${url}]${text}[/url]\n` : '';
+function createCard(type, index) {
+  return `
+  <div class="bg-slate-800 border border-slate-700 rounded-xl p-5">
+    <h3 class="font-semibold mb-3">${type} #${index}</h3>
+    <input class="w-full mb-2 p-2 rounded bg-slate-900 border border-slate-700 received" placeholder="Received URL">
+    <input class="w-full mb-2 p-2 rounded bg-slate-900 border border-slate-700 accepted" placeholder="Accepted URL">
+    <input class="w-full p-2 rounded bg-slate-900 border border-slate-700 fund" placeholder="Fund Has Been Given URL">
+  </div>`;
 }
 
-/* GENERATE */
+/* ================= ADD CARD ================= */
+let reimCount = 0, propCount = 0;
+
+function addReim() {
+  reimCount++;
+  reimContainer.insertAdjacentHTML('beforeend', createCard('Reimbursement', reimCount));
+}
+
+function addProp() {
+  propCount++;
+  propContainer.insertAdjacentHTML('beforeend', createCard('Proposal', propCount));
+}
+
+/* ================= GENERATE ================= */
 function generateBBCode() {
-  const name = name.value || '-';
-  const rank = rank.value || '-';
   const week = getMonthWeekRange();
 
   let reimbursement = '';
-  let proposal = '';
-
-  document.querySelectorAll('#reportContainer > div').forEach(card => {
+  document.querySelectorAll('#reimContainer > div').forEach(card => {
     reimbursement +=
-      item(card.querySelector('.reim-r').value, 'Received Reimbursement') +
-      item(card.querySelector('.reim-a').value, 'Accepted Reimbursement') +
-      item(card.querySelector('.reim-f').value, 'Fund Has Been Given');
+      item(card.querySelector('.received').value, 'Received Reimbursement') +
+      item(card.querySelector('.accepted').value, 'Accepted Reimbursement') +
+      item(card.querySelector('.fund').value, 'Fund Has Been Given');
+  });
 
+  let proposal = '';
+  document.querySelectorAll('#propContainer > div').forEach(card => {
     proposal +=
-      item(card.querySelector('.prop-r').value, 'Received Proposal') +
-      item(card.querySelector('.prop-a').value, 'Accepted Proposal') +
-      item(card.querySelector('.prop-f').value, 'Fund Has Been Given');
+      item(card.querySelector('.received').value, 'Received Proposal') +
+      item(card.querySelector('.accepted').value, 'Accepted Proposal') +
+      item(card.querySelector('.fund').value, 'Fund Has Been Given');
   });
 
   output.value = `[divbox=darkblue][divbox=white]
@@ -111,31 +126,34 @@ function generateBBCode() {
 [hr][/hr]
 [divbox=darkblue][color=#FFFFFF][center][size=150][b]Financial Regulator Activity Report[/b][/size][/center][/color][/divbox]
 [hr][/hr]
-[b]Name[/b] : ${name}
-[b]Current Rank[/b] : ${rank}
+[b]Name[/b] : ${name.value || '-'}
+[b]Current Rank[/b] : ${rank.value || '-'}
 [b]Week[/b] : Week #${week.start} - Week #${week.end}
 
 [b]Report:[/b]
 [secspoiler=Reimbursement]
 [list=1]
-${reimbursement}[/list]
+${reimbursement || '[*]No reimbursement activity'}
+[/list]
 [/secspoiler]
 
 [secspoiler=Proposal]
 [list=1]
-${proposal}[/list]
+${proposal || '[*]No proposal activity'}
+[/list]
 [/secspoiler]`;
 }
 
-/* COPY */
+/* ================= COPY ================= */
 function copyBBCode() {
   if (!output.value) return;
   navigator.clipboard.writeText(output.value);
-  alert('BBCode copied!');
+  alert('BBCode copied successfully!');
 }
 
 /* INIT */
-addCard();
+addReim();
+addProp();
 </script>
 
 </body>
