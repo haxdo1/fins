@@ -3,42 +3,42 @@
 <head>
   <meta charset="UTF-8">
   <title>Activity Report BBCode Generator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-slate-200 min-h-screen p-6">
 
   <div class="max-w-5xl mx-auto">
-    <!-- Header -->
+
+    <!-- HEADER -->
     <div class="mb-8 text-center">
       <h1 class="text-3xl font-bold text-white">Activity Report BBCode Generator</h1>
       <p class="text-slate-400 mt-2">
-        Generate clean, structured BBCode reports for Financial Regulator activities
+        Professional BBCode generator for Financial Regulator activity reports
       </p>
     </div>
 
-    <!-- Identity Card -->
+    <!-- IDENTITY -->
     <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 mb-6 shadow-lg">
       <h2 class="text-xl font-semibold mb-4 text-white">Staff Identity</h2>
-
       <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div>
           <label class="text-sm text-slate-400">Full Name</label>
-          <input id="name" class="w-full mt-1 p-2.5 rounded bg-slate-900 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
+          <input id="name" class="w-full mt-1 p-2.5 rounded bg-slate-900 border border-slate-700 focus:ring-2 focus:ring-blue-600 outline-none"
             placeholder="Joao Lucenzo">
         </div>
-
         <div>
           <label class="text-sm text-slate-400">Current Rank</label>
-          <input id="rank" class="w-full mt-1 p-2.5 rounded bg-slate-900 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
+          <input id="rank" class="w-full mt-1 p-2.5 rounded bg-slate-900 border border-slate-700 focus:ring-2 focus:ring-blue-600 outline-none"
             placeholder="Novice Staff">
         </div>
       </div>
     </div>
 
-    <!-- Reimbursement Card -->
+    <!-- REIMBURSEMENT -->
     <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 mb-6 shadow-lg">
       <h2 class="text-xl font-semibold mb-4 text-white">Reimbursement Report</h2>
-
       <div class="space-y-3">
         <input id="reim_received" class="w-full p-2.5 rounded bg-slate-900 border border-slate-700"
           placeholder="Received Reimbursement URL">
@@ -49,10 +49,9 @@
       </div>
     </div>
 
-    <!-- Proposal Card -->
+    <!-- PROPOSAL -->
     <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 mb-8 shadow-lg">
       <h2 class="text-xl font-semibold mb-4 text-white">Proposal Report</h2>
-
       <div class="space-y-3">
         <input id="prop_received" class="w-full p-2.5 rounded bg-slate-900 border border-slate-700"
           placeholder="Received Proposal URL">
@@ -63,7 +62,7 @@
       </div>
     </div>
 
-    <!-- Action Buttons -->
+    <!-- ACTION BUTTONS -->
     <div class="flex flex-col md:flex-row gap-4 mb-6">
       <button onclick="generateBBCode()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold p-3 rounded-lg transition">
         Generate BBCode
@@ -73,32 +72,38 @@
       </button>
     </div>
 
-    <!-- Output -->
+    <!-- OUTPUT -->
     <div class="bg-slate-900 border border-slate-700 rounded-xl p-4 shadow-lg">
-      <textarea id="output" class="w-full h-96 bg-transparent text-sm font-mono text-slate-200 resize-none focus:outline-none"
+      <textarea id="output" class="w-full h-96 bg-transparent text-sm font-mono resize-none focus:outline-none"
         placeholder="Generated BBCode will appear here..." readonly></textarea>
     </div>
 
   </div>
 
 <script>
-function getWeekOfMonth(date = new Date()) {
-  const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
-  return Math.ceil((date.getDate() + firstDay.getDay()) / 7);
+/* =========================
+   CONTINUOUS WEEK PER MONTH
+   January  = Week 1 - 5
+   February = Week 6 - 10
+   ========================= */
+function getMonthWeekRange(date = new Date()) {
+  const monthIndex = date.getMonth(); // 0 = January
+  const startWeek = (monthIndex * 5) + 1;
+  const endWeek = startWeek + 4;
+  return { startWeek, endWeek };
 }
 
+/* BBCode list item helper */
 function item(url, label) {
   return url ? `[*][url=${url}]${label}[/url]\n` : '';
 }
 
+/* MAIN GENERATOR */
 function generateBBCode() {
   const name = document.getElementById('name').value || '-';
   const rank = document.getElementById('rank').value || '-';
 
-  const now = new Date();
-  const week = getWeekOfMonth(now);
-  const month = now.toLocaleString('en-US', { month: 'long' });
-  const year = now.getFullYear();
+  const weekData = getMonthWeekRange(new Date());
 
   const reimbursement =
     item(reim_received.value, 'Received Reimbursement') +
@@ -110,7 +115,7 @@ function generateBBCode() {
     item(prop_accepted.value, 'Accepted Proposal') +
     item(prop_fund.value, 'Fund Has Been Given');
 
-  output.value = `[divbox=darkblue][divbox=white]
+  document.getElementById('output').value = `[divbox=darkblue][divbox=white]
 
 [center][img]https://news.san-andreas.net/download/file.php?avatar=g69_1637211788.png[/img][/center]
 [hr][/hr]
@@ -118,7 +123,7 @@ function generateBBCode() {
 [hr][/hr]
 [b]Name[/b] : ${name}
 [b]Current Rank[/b] : ${rank}
-[b]Week[/b] : Week #${week} - ${month} ${year}
+[b]Week[/b] : Week #${weekData.startWeek} - Week #${weekData.endWeek}
 
 [b]Report:[/b]
 [secspoiler=Reimbursement]
@@ -132,7 +137,10 @@ ${proposal}[/list]
 [/secspoiler]`;
 }
 
+/* COPY FUNCTION */
 function copyBBCode() {
+  const output = document.getElementById('output');
+  if (!output.value) return;
   navigator.clipboard.writeText(output.value);
   alert('BBCode copied successfully!');
 }
