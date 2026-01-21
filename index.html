@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>BBCode Activity Report Generator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-white min-h-screen p-6">
+
+  <div class="max-w-4xl mx-auto bg-slate-800 p-6 rounded-xl shadow-lg">
+    <h1 class="text-2xl font-bold mb-6 text-center">BBCode Activity Report Generator</h1>
+
+    <!-- Identity -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <div>
+        <label class="block mb-1">Name</label>
+        <input id="name" class="w-full p-2 rounded bg-slate-700" placeholder="Joao Lucenzo">
+      </div>
+      <div>
+        <label class="block mb-1">Current Rank</label>
+        <input id="rank" class="w-full p-2 rounded bg-slate-700" placeholder="Novice Staff">
+      </div>
+    </div>
+
+    <!-- Reimbursement -->
+    <div class="mb-6">
+      <h2 class="text-lg font-semibold mb-2">Reimbursement</h2>
+      <input id="reim_received" class="w-full p-2 rounded bg-slate-700 mb-2" placeholder="Received Reimbursement URL">
+      <input id="reim_accepted" class="w-full p-2 rounded bg-slate-700 mb-2" placeholder="Accepted Reimbursement URL">
+      <input id="reim_fund" class="w-full p-2 rounded bg-slate-700" placeholder="Fund Has Been Given URL">
+    </div>
+
+    <!-- Proposal -->
+    <div class="mb-6">
+      <h2 class="text-lg font-semibold mb-2">Proposal</h2>
+      <input id="prop_received" class="w-full p-2 rounded bg-slate-700 mb-2" placeholder="Received Proposal URL">
+      <input id="prop_accepted" class="w-full p-2 rounded bg-slate-700 mb-2" placeholder="Accepted Proposal URL">
+      <input id="prop_fund" class="w-full p-2 rounded bg-slate-700" placeholder="Fund Has Been Given URL">
+    </div>
+
+    <button onclick="generateBBCode()" class="w-full bg-blue-600 hover:bg-blue-700 p-3 rounded font-bold mb-4">
+      Generate BBCode
+    </button>
+
+    <textarea id="output" class="w-full h-96 p-3 rounded bg-slate-900 text-sm" readonly></textarea>
+
+    <button onclick="copyBBCode()" class="w-full bg-green-600 hover:bg-green-700 p-3 rounded font-bold mt-3">
+      Copy BBCode
+    </button>
+  </div>
+
+<script>
+function getWeekOfMonth(date = new Date()) {
+  const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+  return Math.ceil((date.getDate() + firstDay.getDay()) / 7);
+}
+
+function generateListItem(url, text) {
+  if (!url) return '';
+  return `[*][url=${url}]${text}[/url]\n`;
+}
+
+function generateBBCode() {
+  const name = document.getElementById('name').value || '-';
+  const rank = document.getElementById('rank').value || '-';
+
+  const now = new Date();
+  const week = getWeekOfMonth(now);
+  const month = now.toLocaleString('en-US', { month: 'long' });
+  const year = now.getFullYear();
+
+  let reimbursementItems = '';
+  reimbursementItems += generateListItem(
+    document.getElementById('reim_received').value,
+    'Received Reimbursement'
+  );
+  reimbursementItems += generateListItem(
+    document.getElementById('reim_accepted').value,
+    'Accepted Reimbursement'
+  );
+  reimbursementItems += generateListItem(
+    document.getElementById('reim_fund').value,
+    'Fund Has Been Given'
+  );
+
+  let proposalItems = '';
+  proposalItems += generateListItem(
+    document.getElementById('prop_received').value,
+    'Received Proposal'
+  );
+  proposalItems += generateListItem(
+    document.getElementById('prop_accepted').value,
+    'Accepted Proposal'
+  );
+  proposalItems += generateListItem(
+    document.getElementById('prop_fund').value,
+    'Fund Has Been Given'
+  );
+
+  const bbcode = `[divbox=darkblue][divbox=white]
+
+[center][img]https://news.san-andreas.net/download/file.php?avatar=g69_1637211788.png[/img][/center]
+[hr][/hr]
+[divbox=darkblue][color=#FFFFFF][center][size=150][b]Financial Regulator Activity Report[/b][/size][/center][/color][/divbox]
+[hr][/hr]
+[b]Name[/b] : ${name}
+[b]Current Rank[/b] : ${rank}
+[b]Week[/b] : Week #${week} - ${month} ${year}
+
+[b]Report:[/b]
+[secspoiler=Reimbursement]
+[list=1]
+${reimbursementItems}[/list]
+[/secspoiler]
+
+[secspoiler=Proposal]
+[list=1]
+${proposalItems}[/list]
+[/secspoiler]`;
+
+  document.getElementById('output').value = bbcode;
+}
+
+function copyBBCode() {
+  const output = document.getElementById('output');
+  output.select();
+  document.execCommand('copy');
+  alert('BBCode copied!');
+}
+</script>
+
+</body>
+</html>
