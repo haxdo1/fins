@@ -9,113 +9,103 @@
 
 <body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-slate-200 min-h-screen p-6">
 
-  <div class="max-w-5xl mx-auto">
+<div class="max-w-6xl mx-auto">
 
-    <!-- HEADER -->
-    <div class="mb-8 text-center">
-      <h1 class="text-3xl font-bold text-white">Activity Report BBCode Generator</h1>
-      <p class="text-slate-400 mt-2">
-        Professional BBCode generator for Financial Regulator activity reports
-      </p>
-    </div>
-
-    <!-- IDENTITY -->
-    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 mb-6 shadow-lg">
-      <h2 class="text-xl font-semibold mb-4 text-white">Staff Identity</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <div>
-          <label class="text-sm text-slate-400">Full Name</label>
-          <input id="name" class="w-full mt-1 p-2.5 rounded bg-slate-900 border border-slate-700 focus:ring-2 focus:ring-blue-600 outline-none"
-            placeholder="Joao Lucenzo">
-        </div>
-        <div>
-          <label class="text-sm text-slate-400">Current Rank</label>
-          <input id="rank" class="w-full mt-1 p-2.5 rounded bg-slate-900 border border-slate-700 focus:ring-2 focus:ring-blue-600 outline-none"
-            placeholder="Novice Staff">
-        </div>
-      </div>
-    </div>
-
-    <!-- REIMBURSEMENT -->
-    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 mb-6 shadow-lg">
-      <h2 class="text-xl font-semibold mb-4 text-white">Reimbursement Report</h2>
-      <div class="space-y-3">
-        <input id="reim_received" class="w-full p-2.5 rounded bg-slate-900 border border-slate-700"
-          placeholder="Received Reimbursement URL">
-        <input id="reim_accepted" class="w-full p-2.5 rounded bg-slate-900 border border-slate-700"
-          placeholder="Accepted Reimbursement URL">
-        <input id="reim_fund" class="w-full p-2.5 rounded bg-slate-900 border border-slate-700"
-          placeholder="Fund Has Been Given URL">
-      </div>
-    </div>
-
-    <!-- PROPOSAL -->
-    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 mb-8 shadow-lg">
-      <h2 class="text-xl font-semibold mb-4 text-white">Proposal Report</h2>
-      <div class="space-y-3">
-        <input id="prop_received" class="w-full p-2.5 rounded bg-slate-900 border border-slate-700"
-          placeholder="Received Proposal URL">
-        <input id="prop_accepted" class="w-full p-2.5 rounded bg-slate-900 border border-slate-700"
-          placeholder="Accepted Proposal URL">
-        <input id="prop_fund" class="w-full p-2.5 rounded bg-slate-900 border border-slate-700"
-          placeholder="Fund Has Been Given URL">
-      </div>
-    </div>
-
-    <!-- ACTION BUTTONS -->
-    <div class="flex flex-col md:flex-row gap-4 mb-6">
-      <button onclick="generateBBCode()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold p-3 rounded-lg transition">
-        Generate BBCode
-      </button>
-      <button onclick="copyBBCode()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold p-3 rounded-lg transition">
-        Copy BBCode
-      </button>
-    </div>
-
-    <!-- OUTPUT -->
-    <div class="bg-slate-900 border border-slate-700 rounded-xl p-4 shadow-lg">
-      <textarea id="output" class="w-full h-96 bg-transparent text-sm font-mono resize-none focus:outline-none"
-        placeholder="Generated BBCode will appear here..." readonly></textarea>
-    </div>
-
+  <!-- HEADER -->
+  <div class="mb-8 text-center">
+    <h1 class="text-3xl font-bold text-white">Activity Report BBCode Generator</h1>
+    <p class="text-slate-400 mt-2">Each card equals one activity report</p>
   </div>
 
+  <!-- IDENTITY -->
+  <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 mb-6">
+    <h2 class="text-xl font-semibold mb-4">Staff Identity</h2>
+    <div class="grid md:grid-cols-2 gap-4">
+      <input id="name" class="p-2 rounded bg-slate-900 border border-slate-700" placeholder="Full Name">
+      <input id="rank" class="p-2 rounded bg-slate-900 border border-slate-700" placeholder="Current Rank">
+    </div>
+  </div>
+
+  <!-- REPORT CARDS -->
+  <div id="reportContainer" class="space-y-6"></div>
+
+  <!-- ADD CARD -->
+  <button onclick="addCard()" class="w-full bg-indigo-600 hover:bg-indigo-700 p-3 rounded-lg font-semibold mb-6">
+    ➕ Add Report Card
+  </button>
+
+  <!-- ACTIONS -->
+  <div class="flex gap-4 mb-6">
+    <button onclick="generateBBCode()" class="flex-1 bg-blue-600 hover:bg-blue-700 p-3 rounded-lg font-semibold">
+      Generate BBCode
+    </button>
+    <button onclick="copyBBCode()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 p-3 rounded-lg font-semibold">
+      Copy BBCode
+    </button>
+  </div>
+
+  <!-- OUTPUT -->
+  <textarea id="output" class="w-full h-96 bg-slate-900 border border-slate-700 rounded-xl p-4 font-mono text-sm" readonly></textarea>
+
+</div>
+
 <script>
-/* =========================
-   CONTINUOUS WEEK PER MONTH
-   January  = Week 1 - 5
-   February = Week 6 - 10
-   ========================= */
+let cardCount = 0;
+
+/* WEEK RANGE */
 function getMonthWeekRange(date = new Date()) {
-  const monthIndex = date.getMonth(); // 0 = January
-  const startWeek = (monthIndex * 5) + 1;
-  const endWeek = startWeek + 4;
-  return { startWeek, endWeek };
+  const start = (date.getMonth() * 5) + 1;
+  return { start, end: start + 4 };
 }
 
-/* BBCode list item helper */
-function item(url, label) {
-  return url ? `[*][url=${url}]${label}[/url]\n` : '';
+/* ADD CARD */
+function addCard() {
+  cardCount++;
+  const card = document.createElement('div');
+  card.className = "bg-slate-800 border border-slate-700 rounded-xl p-6";
+  card.innerHTML = `
+    <h3 class="text-lg font-semibold mb-4">Report #${cardCount}</h3>
+
+    <p class="text-sm text-slate-400 mb-2">Reimbursement</p>
+    <input class="w-full mb-2 p-2 rounded bg-slate-900 border border-slate-700 reim-r" placeholder="Received URL">
+    <input class="w-full mb-2 p-2 rounded bg-slate-900 border border-slate-700 reim-a" placeholder="Accepted URL">
+    <input class="w-full mb-4 p-2 rounded bg-slate-900 border border-slate-700 reim-f" placeholder="Fund Given URL">
+
+    <p class="text-sm text-slate-400 mb-2">Proposal</p>
+    <input class="w-full mb-2 p-2 rounded bg-slate-900 border border-slate-700 prop-r" placeholder="Received URL">
+    <input class="w-full mb-2 p-2 rounded bg-slate-900 border border-slate-700 prop-a" placeholder="Accepted URL">
+    <input class="w-full p-2 rounded bg-slate-900 border border-slate-700 prop-f" placeholder="Fund Given URL">
+  `;
+  document.getElementById('reportContainer').appendChild(card);
 }
 
-/* MAIN GENERATOR */
+/* ITEM */
+function item(url, text) {
+  return url ? `[*][url=${url}]${text}[/url]\n` : '';
+}
+
+/* GENERATE */
 function generateBBCode() {
-  const name = document.getElementById('name').value || '-';
-  const rank = document.getElementById('rank').value || '-';
+  const name = name.value || '-';
+  const rank = rank.value || '-';
+  const week = getMonthWeekRange();
 
-  const weekData = getMonthWeekRange(new Date());
+  let reimbursement = '';
+  let proposal = '';
 
-  const reimbursement =
-    item(reim_received.value, 'Received Reimbursement') +
-    item(reim_accepted.value, 'Accepted Reimbursement') +
-    item(reim_fund.value, 'Fund Has Been Given');
+  document.querySelectorAll('#reportContainer > div').forEach(card => {
+    reimbursement +=
+      item(card.querySelector('.reim-r').value, 'Received Reimbursement') +
+      item(card.querySelector('.reim-a').value, 'Accepted Reimbursement') +
+      item(card.querySelector('.reim-f').value, 'Fund Has Been Given');
 
-  const proposal =
-    item(prop_received.value, 'Received Proposal') +
-    item(prop_accepted.value, 'Accepted Proposal') +
-    item(prop_fund.value, 'Fund Has Been Given');
+    proposal +=
+      item(card.querySelector('.prop-r').value, 'Received Proposal') +
+      item(card.querySelector('.prop-a').value, 'Accepted Proposal') +
+      item(card.querySelector('.prop-f').value, 'Fund Has Been Given');
+  });
 
-  document.getElementById('output').value = `[divbox=darkblue][divbox=white]
+  output.value = `[divbox=darkblue][divbox=white]
 
 [center][img]https://news.san-andreas.net/download/file.php?avatar=g69_1637211788.png[/img][/center]
 [hr][/hr]
@@ -123,7 +113,7 @@ function generateBBCode() {
 [hr][/hr]
 [b]Name[/b] : ${name}
 [b]Current Rank[/b] : ${rank}
-[b]Week[/b] : Week #${weekData.startWeek} - Week #${weekData.endWeek}
+[b]Week[/b] : Week #${week.start} - Week #${week.end}
 
 [b]Report:[/b]
 [secspoiler=Reimbursement]
@@ -137,13 +127,15 @@ ${proposal}[/list]
 [/secspoiler]`;
 }
 
-/* COPY FUNCTION */
+/* COPY */
 function copyBBCode() {
-  const output = document.getElementById('output');
   if (!output.value) return;
   navigator.clipboard.writeText(output.value);
-  alert('BBCode copied successfully!');
+  alert('BBCode copied!');
 }
+
+/* INIT */
+addCard();
 </script>
 
 </body>
