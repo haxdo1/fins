@@ -1,179 +1,179 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Activity Report BBCode Generator</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="https://cdn.tailwindcss.com"></script>
+<meta charset="UTF-8">
+<title>Laporan Generator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+    body {
+        font-family: Inter, system-ui, sans-serif;
+        background: #f4f6f8;
+        margin: 0;
+        padding: 30px;
+        color: #1f2937;
+    }
+
+    h1 {
+        margin-bottom: 20px;
+    }
+
+    .controls {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 25px;
+    }
+
+    button {
+        padding: 10px 16px;
+        border: none;
+        border-radius: 8px;
+        background: #2563eb;
+        color: white;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    button.secondary {
+        background: #10b981;
+    }
+
+    .card {
+        background: white;
+        border-radius: 14px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .badge {
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+        background: #e5e7eb;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 14px;
+    }
+
+    input, select {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #d1d5db;
+        font-size: 14px;
+    }
+
+    .output {
+        margin-top: 15px;
+        background: #0f172a;
+        color: #e5e7eb;
+        padding: 14px;
+        border-radius: 10px;
+        font-family: monospace;
+        font-size: 13px;
+        word-break: break-word;
+    }
+
+    .remove {
+        background: #ef4444;
+    }
+</style>
 </head>
 
-<body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-slate-200 min-h-screen p-6">
+<body>
 
-<div class="max-w-6xl mx-auto">
+<h1>Laporan Generator</h1>
 
-  <!-- HEADER -->
-  <div class="mb-8 text-center">
-    <h1 class="text-3xl font-bold text-white">Activity Report BBCode Generator</h1>
-    <p class="text-slate-400 mt-2">
-      Reimbursement & Proposal Standalone Report Generator
-    </p>
-  </div>
-
-  <!-- IDENTITY -->
-  <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 mb-6">
-    <h2 class="text-xl font-semibold mb-4">Staff Identity</h2>
-    <div class="grid md:grid-cols-2 gap-4">
-      <input id="name" class="p-2 rounded bg-slate-900 border border-slate-700" placeholder="Full Name">
-      <input id="rank" class="p-2 rounded bg-slate-900 border border-slate-700" placeholder="Current Rank">
-    </div>
-  </div>
-
-  <!-- REIMBURSEMENT -->
-  <div class="mb-8">
-    <div class="flex justify-between items-center mb-3">
-      <h2 class="text-xl font-semibold">Reimbursement Reports</h2>
-      <button onclick="addReim()" class="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded">
-        ➕ Add Reimbursement
-      </button>
-    </div>
-    <div id="reimContainer" class="space-y-4"></div>
-  </div>
-
-  <!-- PROPOSAL -->
-  <div class="mb-8">
-    <div class="flex justify-between items-center mb-3">
-      <h2 class="text-xl font-semibold">Proposal Reports</h2>
-      <button onclick="addProp()" class="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded">
-        ➕ Add Proposal
-      </button>
-    </div>
-    <div id="propContainer" class="space-y-4"></div>
-  </div>
-
-  <!-- ACTION -->
-  <div class="flex gap-4 mb-6">
-    <button onclick="generateBBCode()" class="flex-1 bg-blue-600 hover:bg-blue-700 p-3 rounded-lg font-semibold">
-      Generate BBCode
-    </button>
-    <button onclick="copyBBCode()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 p-3 rounded-lg font-semibold">
-      Copy BBCode
-    </button>
-  </div>
-
-  <!-- OUTPUT -->
-  <textarea id="output" class="w-full h-96 bg-slate-900 border border-slate-700 rounded-xl p-4 font-mono text-sm" readonly></textarea>
-
+<div class="controls">
+    <button onclick="addCard('reimbursement')">+ Reimbursement</button>
+    <button class="secondary" onclick="addCard('proposal')">+ Proposal</button>
 </div>
 
+<div id="cards"></div>
+
 <script>
-/* ===== WEEK RANGE ===== */
-function getWeekRange(date = new Date()) {
-  const start = (date.getMonth() * 5) + 1;
-  return {
-    start,
-    end: start + 4,
-    month: date.toLocaleString('en-US', { month: 'long' })
-  };
+let cardId = 0;
+
+function getWeekAndMonth() {
+    const now = new Date();
+    const start = new Date(now.getFullYear(), 0, 1);
+    const diff = now - start;
+    const week = Math.ceil(((diff / 86400000) + start.getDay() + 1) / 7);
+    const month = now.toLocaleString('en-US', { month: 'long' });
+    const year = now.getFullYear();
+    return { week, month, year };
 }
 
-/* ===== HELPERS ===== */
-function bbItem(url, text) {
-  return url ? `[*][url=${url}]${text}[/url]\n` : '';
+function addCard(type) {
+    cardId++;
+    const { week, month, year } = getWeekAndMonth();
+
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.dataset.type = type;
+
+    card.innerHTML = `
+        <div class="card-header">
+            <strong>${type === 'reimbursement' ? 'Reimbursement' : 'Proposal'}</strong>
+            <button class="remove" onclick="this.closest('.card').remove()">Remove</button>
+        </div>
+
+        <div class="grid">
+            <input placeholder="Name" class="name">
+            ${type === 'proposal' ? `<input placeholder="Proposal Type (e.g CC Salary March ${year})" class="ptype">` : ''}
+            <input placeholder="Link" class="link">
+            <select class="status">
+                <option value="RECEIVED">RECEIVED</option>
+                <option value="ACCEPTED">ACCEPTED</option>
+                <option value="FUNDS HAVE BEEN GIVEN">FUNDS HAVE BEEN GIVEN</option>
+            </select>
+        </div>
+
+        <div class="output"></div>
+    `;
+
+    document.getElementById('cards').appendChild(card);
+
+    card.querySelectorAll('input, select').forEach(el => {
+        el.addEventListener('input', () => updateOutput(card, week, month, year));
+        el.addEventListener('change', () => updateOutput(card, week, month, year));
+    });
+
+    updateOutput(card, week, month, year);
 }
 
-/* ===== CARD TEMPLATES ===== */
-let reimCount = 0, propCount = 0;
+function updateOutput(card, week, month, year) {
+    const type = card.dataset.type;
+    const name = card.querySelector('.name').value || '-';
+    const link = card.querySelector('.link').value || '-';
+    const status = card.querySelector('.status').value;
+    const ptype = card.querySelector('.ptype')?.value || '';
 
-function addReim() {
-  reimCount++;
-  reimContainer.insertAdjacentHTML('beforeend', `
-  <div class="bg-slate-800 border border-slate-700 rounded-xl p-5">
-    <h3 class="font-semibold mb-3">Reimbursement #${reimCount}</h3>
-    <input class="w-full mb-2 p-2 rounded bg-slate-900 border border-slate-700 person"
-      placeholder="Reimbursement Name (e.g. Ismail Rothschild)">
-    <input class="w-full mb-2 p-2 rounded bg-slate-900 border border-slate-700 received" placeholder="Received URL">
-    <input class="w-full mb-2 p-2 rounded bg-slate-900 border border-slate-700 accepted" placeholder="Accepted URL">
-    <input class="w-full p-2 rounded bg-slate-900 border border-slate-700 fund" placeholder="Funds Have Been Given URL">
-  </div>`);
+    let text = '';
+
+    if (type === 'reimbursement') {
+        text = `[${status}] Reimbursement ${name} (Week ${week} / ${month})`;
+    } else {
+        text = `[PROPOSAL] ${name} - ${ptype} - ${status}`;
+    }
+
+    card.querySelector('.output').innerHTML = `
+${text}
+Link: ${link}
+`;
 }
-
-function addProp() {
-  propCount++;
-  propContainer.insertAdjacentHTML('beforeend', `
-  <div class="bg-slate-800 border border-slate-700 rounded-xl p-5">
-    <h3 class="font-semibold mb-3">Proposal #${propCount}</h3>
-    <input class="w-full mb-2 p-2 rounded bg-slate-900 border border-slate-700 manager"
-      placeholder="Manager Name (e.g. Jason Sullivan)">
-    <input class="w-full mb-2 p-2 rounded bg-slate-900 border border-slate-700 type"
-      placeholder="Proposal Type (e.g. CC Salary March 2025)">
-    <input class="w-full mb-2 p-2 rounded bg-slate-900 border border-slate-700 received" placeholder="Receive URL">
-    <input class="w-full mb-2 p-2 rounded bg-slate-900 border border-slate-700 accepted" placeholder="Accepted URL">
-    <input class="w-full p-2 rounded bg-slate-900 border border-slate-700 fund" placeholder="Funds Have Been Given URL">
-  </div>`);
-}
-
-/* ===== GENERATE ===== */
-function generateBBCode() {
-  const week = getWeekRange();
-  let reimText = '', propText = '';
-
-  document.querySelectorAll('#reimContainer > div').forEach(card => {
-    const name = card.querySelector('.person').value || 'Unknown';
-    reimText +=
-      bbItem(card.querySelector('.received').value,
-        `[RECEIVED] Reimbursement ${name} (Week ${week.start} / ${week.month})`) +
-      bbItem(card.querySelector('.accepted').value,
-        `[ACCEPTED] Reimbursement ${name} (Week ${week.start} / ${week.month})`) +
-      bbItem(card.querySelector('.fund').value,
-        `[FUNDS HAVE BEEN GIVEN] Reimbursement ${name} (Week ${week.start} / ${week.month})`);
-  });
-
-  document.querySelectorAll('#propContainer > div').forEach(card => {
-    const manager = card.querySelector('.manager').value || 'Unknown';
-    const type = card.querySelector('.type').value || 'Proposal';
-    propText +=
-      bbItem(card.querySelector('.received').value,
-        `[PROPOSAL] Manager ${manager} - ${type} - RECEIVE`) +
-      bbItem(card.querySelector('.accepted').value,
-        `[PROPOSAL] Manager ${manager} - ${type} - ACCEPTED`) +
-      bbItem(card.querySelector('.fund').value,
-        `[PROPOSAL] Manager ${manager} - ${type} - FUNDS HAVE BEEN GIVEN`);
-  });
-
-  output.value = `[divbox=darkblue][divbox=white]
-
-[center][img]https://news.san-andreas.net/download/file.php?avatar=g69_1637211788.png[/img][/center]
-[hr][/hr]
-[divbox=darkblue][color=#FFFFFF][center][size=150][b]Financial Regulator Activity Report[/b][/size][/center][/color][/divbox]
-[hr][/hr]
-[b]Name[/b] : ${name.value || '-'}
-[b]Current Rank[/b] : ${rank.value || '-'}
-[b]Week[/b] : Week #${week.start} - Week #${week.end}
-
-[b]Report:[/b]
-[secspoiler=Reimbursement]
-[list=1]
-${reimText || '[*]No reimbursement activity'}
-[/list]
-[/secspoiler]
-
-[secspoiler=Proposal]
-[list=1]
-${propText || '[*]No proposal activity'}
-[/list]
-[/secspoiler]`;
-}
-
-/* ===== COPY ===== */
-function copyBBCode() {
-  if (!output.value) return;
-  navigator.clipboard.writeText(output.value);
-  alert('BBCode copied successfully!');
-}
-
-/* INIT */
-addReim();
-addProp();
 </script>
 
 </body>
