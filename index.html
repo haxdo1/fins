@@ -99,32 +99,55 @@
 
   <div class="max-w-5xl mx-auto p-6 md:p-12">
 
-    <!-- HEADER -->
-    <div class="mb-12 text-center space-y-3">
-      <div
-        class="inline-flex items-center justify-center p-3 bg-slate-900 rounded-xl mb-4 border border-slate-800 shadow-sm">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-indigo-500" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-          <polyline points="14 2 14 8 20 8"></polyline>
-          <line x1="16" y1="13" x2="8" y2="13"></line>
-          <line x1="16" y1="17" x2="8" y2="17"></line>
-          <polyline points="10 9 9 9 8 9"></polyline>
-        </svg>
+    <!-- HEADER WITH LOGO AND TITLE -->
+    <div class="mb-10 text-center">
+      <div class="flex justify-center mb-4">
+        <img src="https://news.san-andreas.net/download/file.php?avatar=g69_1637211788.png"
+          alt="Financial Regulator Logo" class="h-24 w-24 rounded-xl shadow-lg">
       </div>
-      <h1 class="text-3xl md:text-4xl font-bold text-white tracking-tight">
-        FINS Report Generator
+      <h1
+        class="text-3xl md:text-4xl font-bold text-white mb-2 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+        Financial Regulator
       </h1>
+      <p class="text-slate-400 text-lg font-medium">Activity Report Generator</p>
+    </div>
+
+    <!-- REPORT TYPE SELECTOR -->
+    <div class="mb-8 flex justify-center">
+      <div class="bg-slate-900 p-1.5 rounded-xl border border-slate-800 flex gap-1 shadow-lg">
+        <button id="modeActivity" onclick="switchReportMode('activity')"
+          class="px-6 py-2 rounded-lg text-sm font-bold transition-all bg-indigo-600 text-white shadow-md">
+          Activity Report
+        </button>
+        <button id="modeVice" onclick="switchReportMode('vice')"
+          class="px-6 py-2 rounded-lg text-sm font-bold transition-all text-slate-500 hover:text-slate-300">
+          Vice Manager Report
+        </button>
+      </div>
+    </div>
+
+    <!-- VICE MANAGER SUB-TAB SELECTOR -->
+    <div id="viceSubTabs" class="mb-8 flex justify-center hidden">
+      <div class="bg-slate-800 p-1 rounded-lg border border-slate-700 flex gap-1">
+        <button id="viceReimbursement" onclick="switchViceSubTab('reimbursement')"
+          class="px-4 py-1.5 rounded-md text-xs font-semibold transition-all bg-emerald-600 text-white">
+          Reimbursement
+        </button>
+        <button id="viceProposal" onclick="switchViceSubTab('proposal')"
+          class="px-4 py-1.5 rounded-md text-xs font-semibold transition-all text-slate-400 hover:text-slate-200">
+          Proposal
+        </button>
+      </div>
     </div>
 
     <!-- MAIN GRID -->
     <div class="grid lg:grid-cols-12 gap-8 items-start">
 
       <!-- LEFT COLUMN (Inputs) -->
-      <div class="lg:col-span-8 space-y-10">
+      <div id="inputColumn" class="lg:col-span-8 space-y-10">
 
         <!-- IDENTITY CARD -->
-        <section>
+        <section id="identitySection">
           <div class="flex items-center gap-2 mb-4 px-1">
             <svg class="w-5 h-5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -136,11 +159,30 @@
             <div class="grid md:grid-cols-2 gap-6">
               <div class="space-y-2">
                 <label for="staffName" class="block text-sm font-medium text-slate-400">Full Name</label>
-                <input id="staffName" class="w-full p-2.5 rounded-lg input-field text-sm" placeholder="e.g. John Doe">
+                <input id="staffName" class="w-full p-2.5 rounded-lg input-field text-sm" placeholder="e.g. John Doe"
+                  oninput="saveIdentity(); generateBBCode()">
               </div>
               <div class="space-y-2">
                 <label for="rank" class="block text-sm font-medium text-slate-400">Current Rank</label>
-                <input id="rank" class="w-full p-2.5 rounded-lg input-field text-sm" placeholder="e.g. Senior Officer">
+                <input id="rank" class="w-full p-2.5 rounded-lg input-field text-sm" placeholder="e.g. Senior Officer"
+                  oninput="saveIdentity(); generateBBCode()">
+              </div>
+
+              <!-- VICE MANAGER SPECIFIC FIELDS -->
+              <div class="space-y-2 vice-only hidden">
+                <label for="targetManager" class="block text-sm font-medium text-slate-400">Target Manager</label>
+                <input id="targetManager" class="w-full p-2.5 rounded-lg input-field text-sm"
+                  placeholder="e.g. Mr Schafer Eginhardt" oninput="saveIdentity(); generateBBCode()">
+              </div>
+              <div class="space-y-2 vice-only hidden">
+                <label for="reportNum" class="block text-sm font-medium text-slate-400">Report Number</label>
+                <input id="reportNum" class="w-full p-2.5 rounded-lg input-field text-sm" placeholder="e.g. #12"
+                  oninput="saveIdentity(); generateBBCode()">
+              </div>
+              <div class="space-y-2 md:col-span-2 vice-only hidden">
+                <label for="signatureUrl" class="block text-sm font-medium text-slate-400">Signature Image URL</label>
+                <input id="signatureUrl" class="w-full p-2.5 rounded-lg input-field text-sm" placeholder="https://..."
+                  oninput="saveIdentity(); generateBBCode()">
               </div>
             </div>
           </div>
@@ -165,7 +207,7 @@
         </section>
 
         <!-- PROPOSAL SECTION -->
-        <section>
+        <section id="proposalSection">
           <div class="flex justify-between items-end mb-4 px-1">
             <div class="flex items-center gap-2">
               <div class="w-1 h-5 bg-blue-500 rounded-full"></div>
@@ -284,17 +326,103 @@
       return url ? `[*][url=${url}]${text}[/url]\n` : '';
     }
 
+    let currentMode = 'activity';
+    let viceSubTab = 'reimbursement'; // Default to reimbursement
+
+    function switchReportMode(mode) {
+      currentMode = mode;
+      const activityBtn = document.getElementById('modeActivity');
+      const viceBtn = document.getElementById('modeVice');
+      const viceFields = document.querySelectorAll('.vice-only');
+      const proposalSection = document.getElementById('proposalSection');
+      const viceSubTabs = document.getElementById('viceSubTabs');
+      const reimSection = document.querySelector('#reimContainer').closest('section');
+
+      if (mode === 'activity') {
+        activityBtn.className = "px-6 py-2 rounded-lg text-sm font-bold transition-all bg-indigo-600 text-white shadow-md";
+        viceBtn.className = "px-6 py-2 rounded-lg text-sm font-bold transition-all text-slate-500 hover:text-slate-300";
+        viceFields.forEach(f => f.classList.add('hidden'));
+        proposalSection.classList.remove('hidden');
+        reimSection.classList.remove('hidden');
+        viceSubTabs.classList.add('hidden');
+        document.querySelectorAll('.nominal-field').forEach(f => f.classList.add('hidden'));
+        document.querySelectorAll('.activity-links').forEach(f => f.classList.remove('hidden'));
+        document.querySelectorAll('.vice-links').forEach(f => f.classList.add('hidden'));
+      } else {
+        viceBtn.className = "px-6 py-2 rounded-lg text-sm font-bold transition-all bg-indigo-600 text-white shadow-md";
+        activityBtn.className = "px-6 py-2 rounded-lg text-sm font-bold transition-all text-slate-500 hover:text-slate-300";
+        viceFields.forEach(f => f.classList.remove('hidden'));
+        viceSubTabs.classList.remove('hidden');
+        document.querySelectorAll('.nominal-field').forEach(f => f.classList.remove('hidden'));
+        document.querySelectorAll('.activity-links').forEach(f => f.classList.add('hidden'));
+        document.querySelectorAll('.vice-links').forEach(f => f.classList.remove('hidden'));
+
+        // Apply current sub-tab selection
+        switchViceSubTab(viceSubTab);
+      }
+      generateBBCode();
+    }
+
+    function switchViceSubTab(subTab) {
+      viceSubTab = subTab;
+      const reimBtn = document.getElementById('viceReimbursement');
+      const propBtn = document.getElementById('viceProposal');
+      const proposalSection = document.getElementById('proposalSection');
+      const reimSection = document.querySelector('#reimContainer').closest('section');
+
+      if (subTab === 'reimbursement') {
+        reimBtn.className = "px-4 py-1.5 rounded-md text-xs font-semibold transition-all bg-emerald-600 text-white";
+        propBtn.className = "px-4 py-1.5 rounded-md text-xs font-semibold transition-all text-slate-400 hover:text-slate-200";
+        reimSection.classList.remove('hidden');
+        proposalSection.classList.add('hidden');
+      } else {
+        propBtn.className = "px-4 py-1.5 rounded-md text-xs font-semibold transition-all bg-blue-600 text-white";
+        reimBtn.className = "px-4 py-1.5 rounded-md text-xs font-semibold transition-all text-slate-400 hover:text-slate-200";
+        reimSection.classList.add('hidden');
+        proposalSection.classList.remove('hidden');
+      }
+      generateBBCode();
+    }
+
+    function saveIdentity() {
+      localStorage.setItem('fins_staffName', document.getElementById('staffName').value);
+      localStorage.setItem('fins_rank', document.getElementById('rank').value);
+      localStorage.setItem('fins_targetManager', document.getElementById('targetManager').value);
+      localStorage.setItem('fins_reportNum', document.getElementById('reportNum').value);
+      localStorage.setItem('fins_signatureUrl', document.getElementById('signatureUrl').value);
+      localStorage.setItem('fins_mode', currentMode);
+    }
+
+    function loadIdentity() {
+      const savedName = localStorage.getItem('fins_staffName');
+      const savedRank = localStorage.getItem('fins_rank');
+      const savedTarget = localStorage.getItem('fins_targetManager');
+      const savedNum = localStorage.getItem('fins_reportNum');
+      const savedSig = localStorage.getItem('fins_signatureUrl');
+      const savedMode = localStorage.getItem('fins_mode');
+
+      if (savedName) document.getElementById('staffName').value = savedName;
+      if (savedRank) document.getElementById('rank').value = savedRank;
+      if (savedTarget) document.getElementById('targetManager').value = savedTarget;
+      if (savedNum) document.getElementById('reportNum').value = savedNum;
+      if (savedSig) document.getElementById('signatureUrl').value = savedSig;
+      if (savedMode) switchReportMode(savedMode);
+    }
+
     /* ===== PARSER ===== */
     function parseBBCode(text) {
       if (!text) return '';
       let html = text
         .replace(/</g, "&lt;").replace(/>/g, "&gt;") // Sanitize HTML
         .replace(/\[center\](.*?)\[\/center\]/gs, '<div class="text-center">$1</div>')
+        .replace(/\[right\](.*?)\[\/right\]/gs, '<div class="text-right">$1</div>')
         .replace(/\[b\](.*?)\[\/b\]/gs, '<b>$1</b>')
-        .replace(/\[img\](.*?)\[\/img\]/g, '<img src="$1" class="mx-auto max-w-full rounded shadow-sm my-2" style="max-height:100px;">')
+        .replace(/\[i\](.*?)\[\/i\]/gs, '<i>$1</i>')
+        .replace(/\[img\](.*?)\[\/img\]/g, '<img src="$1" class="mx-auto max-w-full rounded shadow-sm my-2" style="max-height:100px; display: inline-block;">')
         .replace(/\[url=(.*?)\](.*?)\[\/url\]/g, '<a href="$1" target="_blank" class="text-blue-600 hover:underline">$2</a>')
         .replace(/\[size=150\](.*?)\[\/size\]/gs, '<span class="text-xl font-bold">$1</span>')
         .replace(/\[color=#FFFFFF\](.*?)\[\/color\]/gs, '<span style="color:white">$1</span>')
+        .replace(/\[color=white\](.*?)\[\/color\]/gs, '<span style="color:white">$1</span>')
         .replace(/\[divbox=darkblue\]/g, '<div class="bg-blue-900 p-4 rounded-lg text-white mb-2 shadow-sm start-divbox">')
         .replace(/\[divbox=white\]/g, '<div class="bg-white p-4 rounded-lg text-slate-900 mb-2 border border-slate-200 shadow-sm start-divbox">')
         .replace(/\[\/divbox\]/g, '</div>')
@@ -304,6 +432,15 @@
         .replace(/\[list=1\]/g, '<ol class="list-decimal pl-5 space-y-1">')
         .replace(/\[\/list\]/g, '</ol>')
         .replace(/\[\*\]/g, '<li class="marker:text-slate-400">')
+        .replace(/\[table\]/g, '<table class="w-full border-collapse border border-slate-300 my-4">')
+        .replace(/\[\/table\]/g, '</table>')
+        .replace(/\[tr\]/g, '<tr class="border-b border-slate-200">')
+        .replace(/\[\/tr\]/g, '</tr>')
+        .replace(/\[th\]/g, '<th class="p-2 border border-slate-300 bg-slate-100 text-left font-bold">')
+        .replace(/\[\/th\]/g, '</th>')
+        .replace(/\[td\]/g, '<td class="p-2 border border-slate-300">')
+        .replace(/\[\/td\]/g, '</td>')
+        .replace(/\[cell\]\[\/cell\]/g, '<td class="p-2 border border-slate-300"></td>')
         .replace(/\n\n/g, '<br>') // Simple line breaks
         .replace(/\n/g, '<br>'); // Simple line breaks
       return html;
@@ -314,112 +451,186 @@
 
     function addReim() {
       reimCount++;
-      reimContainer.insertAdjacentHTML('beforeend', `
+      const html = `
   <div class="card-panel rounded-xl p-5 relative animate-fade-in group">
     <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-800">
       <h3 class="font-medium text-emerald-500 text-sm">Reimbursement #${reimCount}</h3>
-      <button onclick="this.closest('.card-panel').remove()" class="text-slate-600 hover:text-red-400 transition-colors" title="Remove">
+      <button onclick="this.closest('.card-panel').remove(); generateBBCode()" class="text-slate-600 hover:text-red-400 transition-colors" title="Remove">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
       </button>
     </div>
     <div class="space-y-4">
-      <div>
-        <label class="block text-xs font-medium text-slate-500 mb-1.5 pl-1">Name</label>
-        <input class="w-full p-2.5 rounded-lg input-field sm:text-sm person" placeholder="e.g. Ismail Rothschild">
+      <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+        <div class="sm:col-span-2">
+          <label class="block text-xs font-medium text-slate-500 mb-1.5 pl-1">Name</label>
+          <input class="w-full p-2.5 rounded-lg input-field sm:text-sm person" placeholder="e.g. Ismail Rothschild" oninput="generateBBCode()">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-500 mb-1.5 pl-1">Week</label>
+          <input type="number" class="w-full p-2.5 rounded-lg input-field sm:text-sm week-num" placeholder="Auto" oninput="generateBBCode()">
+        </div>
+        <div class="nominal-field ${currentMode === 'activity' ? 'hidden' : ''}">
+          <label class="block text-xs font-medium text-slate-500 mb-1.5 pl-1">Nominal ($)</label>
+          <input type="number" class="w-full p-2.5 rounded-lg input-field sm:text-sm nominal" placeholder="e.g. 500" oninput="generateBBCode()">
+        </div>
       </div>
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 activity-links ${currentMode === 'vice' ? 'hidden' : ''}">
         <div>
            <label class="block text-xs font-medium text-slate-500 mb-1.5 pl-1">Received URL</label>
-           <input class="w-full p-2.5 rounded-lg input-field sm:text-sm received" placeholder="https://...">
+           <input class="w-full p-2.5 rounded-lg input-field sm:text-sm received" placeholder="https://..." oninput="generateBBCode()">
         </div>
         <div>
            <label class="block text-xs font-medium text-slate-500 mb-1.5 pl-1">Accepted URL</label>
-           <input class="w-full p-2.5 rounded-lg input-field sm:text-sm accepted" placeholder="https://...">
+           <input class="w-full p-2.5 rounded-lg input-field sm:text-sm accepted" placeholder="https://..." oninput="generateBBCode()">
         </div>
         <div>
            <label class="block text-xs font-medium text-slate-500 mb-1.5 pl-1">Funds Given URL</label>
-           <input class="w-full p-2.5 rounded-lg input-field sm:text-sm fund" placeholder="https://...">
+           <input class="w-full p-2.5 rounded-lg input-field sm:text-sm fund" placeholder="https://..." oninput="generateBBCode()">
         </div>
       </div>
+      <div class="vice-links ${currentMode === 'activity' ? 'hidden' : ''}">
+         <label class="block text-xs font-medium text-slate-500 mb-1.5 pl-1">Proof URL</label>
+         <input class="w-full p-2.5 rounded-lg input-field sm:text-sm proof" placeholder="https://..." oninput="generateBBCode()">
+      </div>
     </div>
-  </div>`);
+  </div>`;
+      reimContainer.insertAdjacentHTML('beforeend', html);
+      generateBBCode();
     }
 
     function addProp() {
       propCount++;
-      propContainer.insertAdjacentHTML('beforeend', `
+      const html = `
   <div class="card-panel rounded-xl p-5 relative animate-fade-in group">
     <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-800">
       <h3 class="font-medium text-blue-500 text-sm">Proposal #${propCount}</h3>
-      <button onclick="this.closest('.card-panel').remove()" class="text-slate-600 hover:text-red-400 transition-colors" title="Remove">
+      <button onclick="this.closest('.card-panel').remove(); generateBBCode()" class="text-slate-600 hover:text-red-400 transition-colors" title="Remove">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
       </button>
     </div>
     <div class="space-y-4">
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
          <div>
             <label class="block text-xs font-medium text-slate-500 mb-1.5 pl-1">Manager</label>
-            <input class="w-full p-2.5 rounded-lg input-field sm:text-sm manager" placeholder="e.g. Jason Sullivan">
+            <input class="w-full p-2.5 rounded-lg input-field sm:text-sm manager" placeholder="e.g. Jason Sullivan" oninput="generateBBCode()">
          </div>
          <div>
             <label class="block text-xs font-medium text-slate-500 mb-1.5 pl-1">Type</label>
-            <input class="w-full p-2.5 rounded-lg input-field sm:text-sm type" placeholder="e.g. CC Salary Mar 2025">
+            <input class="w-full p-2.5 rounded-lg input-field sm:text-sm type" placeholder="e.g. CC Salary Mar 2025" oninput="generateBBCode()">
+         </div>
+         <div class="nominal-field ${currentMode === 'activity' ? 'hidden' : ''}">
+           <label class="block text-xs font-medium text-slate-500 mb-1.5 pl-1">Nominal ($)</label>
+           <input type="number" class="w-full p-2.5 rounded-lg input-field sm:text-sm nominal" placeholder="e.g. 20900" oninput="generateBBCode()">
          </div>
       </div>
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 activity-links ${currentMode === 'vice' ? 'hidden' : ''}">
         <div>
            <label class="block text-xs font-medium text-slate-500 mb-1.5 pl-1">Received URL</label>
-           <input class="w-full p-2.5 rounded-lg input-field sm:text-sm received" placeholder="https://...">
+           <input class="w-full p-2.5 rounded-lg input-field sm:text-sm received" placeholder="https://..." oninput="generateBBCode()">
         </div>
         <div>
            <label class="block text-xs font-medium text-slate-500 mb-1.5 pl-1">Accepted URL</label>
-           <input class="w-full p-2.5 rounded-lg input-field sm:text-sm accepted" placeholder="https://...">
+           <input class="w-full p-2.5 rounded-lg input-field sm:text-sm accepted" placeholder="https://..." oninput="generateBBCode()">
         </div>
         <div>
            <label class="block text-xs font-medium text-slate-500 mb-1.5 pl-1">Funds Given URL</label>
-           <input class="w-full p-2.5 rounded-lg input-field sm:text-sm fund" placeholder="https://...">
+           <input class="w-full p-2.5 rounded-lg input-field sm:text-sm fund" placeholder="https://..." oninput="generateBBCode()">
         </div>
       </div>
+      <div class="vice-links ${currentMode === 'activity' ? 'hidden' : ''}">
+         <label class="block text-xs font-medium text-slate-500 mb-1.5 pl-1">Proof URL</label>
+         <input class="w-full p-2.5 rounded-lg input-field sm:text-sm proof" placeholder="https://..." oninput="generateBBCode()">
+      </div>
     </div>
-  </div>`);
+  </div>`;
+      propContainer.insertAdjacentHTML('beforeend', html);
+      generateBBCode();
     }
 
     /* ===== GENERATE ===== */
     function generateBBCode() {
       const week = getWeekRange();
-      let reimText = '', propText = '';
+      let reimText = '', propText = '', reimTableRows = '', propTableRows = '';
+      let reimTotalNominal = 0, propTotalNominal = 0;
+      let reimCounter = 0, propCounter = 0;
 
       document.querySelectorAll('#reimContainer > div').forEach(card => {
+        reimCounter++;
         const name = card.querySelector('.person').value || 'Unknown';
+        const itemWeek = card.querySelector('.week-num').value || week.start;
+        const nominalStr = card.querySelector('.nominal').value || '0';
+        const nominal = parseInt(nominalStr.replace(/[^0-9]/g, '')) || 0;
+        const received = card.querySelector('.received').value;
+        const accepted = card.querySelector('.accepted').value;
+        const fund = card.querySelector('.fund').value;
+        const proof = card.querySelector('.proof') ? card.querySelector('.proof').value : '';
+
+        reimTotalNominal += nominal;
+
+        // Activity Mode TEXT
         reimText +=
-          bbItem(card.querySelector('.received').value,
-            `[RECEIVED] Reimbursement ${name} (Week ${week.start} / ${week.month})`) +
-          bbItem(card.querySelector('.accepted').value,
-            `[ACCEPTED] Reimbursement ${name} (Week ${week.start} / ${week.month})`) +
-          bbItem(card.querySelector('.fund').value,
-            `[FUNDS HAVE BEEN GIVEN] Reimbursement ${name} (Week ${week.start} / ${week.month})`);
+          bbItem(received, `[RECEIVED] Reimbursement ${name} (Week ${itemWeek} / ${week.month})`) +
+          bbItem(accepted, `[ACCEPTED] Reimbursement ${name} (Week ${itemWeek} / ${week.month})`) +
+          bbItem(fund, `[FUNDS HAVE BEEN GIVEN] Reimbursement ${name} (Week ${itemWeek} / ${week.month})`);
+
+        // Vice Manager Mode TABLE ROW
+        reimTableRows += `[tr]
+    [td]${reimCounter}[/td]
+    [td][i]${name}[/i][/td]
+    [td][i]Reimbursement ${name} (Week ${itemWeek} / ${week.month})[/i][/td]
+    [td][i]$${nominal.toLocaleString('en-US')}[/i][/td]
+    [td][url=${proof || fund || accepted || received || '#'}]Proof[/url][/td]
+[/tr]
+`;
       });
 
       document.querySelectorAll('#propContainer > div').forEach(card => {
+        propCounter++;
         const manager = card.querySelector('.manager').value || 'Unknown';
         const type = card.querySelector('.type').value || 'Proposal';
+        const nominalStr = card.querySelector('.nominal') ? card.querySelector('.nominal').value || '0' : '0';
+        const nominal = parseInt(nominalStr.replace(/[^0-9]/g, '')) || 0;
+        const received = card.querySelector('.received').value;
+        const accepted = card.querySelector('.accepted').value;
+        const fund = card.querySelector('.fund').value;
+        const proof = card.querySelector('.proof') ? card.querySelector('.proof').value : '';
+
+        propTotalNominal += nominal;
+
+        // Activity Mode TEXT
         propText +=
-          bbItem(card.querySelector('.received').value,
-            `[PROPOSAL] Manager ${manager} - ${type} - RECEIVE`) +
-          bbItem(card.querySelector('.accepted').value,
-            `[PROPOSAL] Manager ${manager} - ${type} - ACCEPTED`) +
-          bbItem(card.querySelector('.fund').value,
-            `[PROPOSAL] Manager ${manager} - ${type} - FUNDS HAVE BEEN GIVEN`);
+          bbItem(received, `[PROPOSAL] Manager ${manager} - ${type} - RECEIVE`) +
+          bbItem(accepted, `[PROPOSAL] Manager ${manager} - ${type} - ACCEPTED`) +
+          bbItem(fund, `[PROPOSAL] Manager ${manager} - ${type} - FUNDS HAVE BEEN GIVEN`);
+
+        // Vice Manager Mode TABLE ROW
+        propTableRows += `[tr]
+    [td]${propCounter}[/td]
+    [td][i]${manager}[/i][/td]
+    [td][i]${type}[/i][/td]
+    [td][i]$${nominal.toLocaleString('en-US')}[/i][/td]
+    [td][url=${proof || fund || accepted || received || '#'}]Proof[/url][/td]
+[/tr]
+`;
       });
 
-      const bbCode = `[divbox=darkblue][divbox=white]
+      const staffName = document.getElementById('staffName').value || '-';
+      const rank = document.getElementById('rank').value || '-';
+      const targetManager = document.getElementById('targetManager').value || 'Mr Schafer Eginhardt';
+      const reportNum = document.getElementById('reportNum').value || '#12';
+      const sigUrl = document.getElementById('signatureUrl').value || 'https://www.upload.ee/image/17958074/signature__1___1_.png';
+
+      let bbCode = '';
+
+      if (currentMode === 'activity') {
+        bbCode = `[divbox=darkblue][divbox=white]
 
 [center][img]https://news.san-andreas.net/download/file.php?avatar=g69_1637211788.png[/img][/center]
 [hr][/hr]
 [divbox=darkblue][color=#FFFFFF][center][size=150][b]Financial Regulator Activity Report[/b][/size][/center][/color][/divbox]
 [hr][/hr]
-[b]Name[/b] : ${document.getElementById('staffName').value || '-'}
-[b]Current Rank[/b] : ${rank.value || '-'}
+[b]Name[/b] : ${staffName}
+[b]Current Rank[/b] : ${rank}
 [b]Week[/b] : Week #${week.start} - Week #${week.end}
 
 [b]Report:[/b]
@@ -435,6 +646,95 @@ ${propText || '[*]No proposal activity'}
 [/list]
 [/secspoiler]
 [/divbox][/divbox]`;
+      } else {
+        // Vice Manager Report - show only selected sub-tab
+        if (viceSubTab === 'reimbursement') {
+          bbCode = `[divbox=darkblue][divbox=white]
+
+[center][img]https://news.san-andreas.net/download/file.php?avatar=g69_1637211788.png[/img]
+
+[divbox=darkblue][center][size=150][color=white][b]MONTHLY VICE MANAGER REPORT[/b][/color][/size][/center][/divbox]
+[hr][/hr]
+
+Dear, ${targetManager}
+
+Best wishes to all of us,
+
+I the financial supervisor, would like to submit a monthly report regarding the company's financial condition. This report includes important information about the company's financial performance during the previous month.
+During this month, our finance team and I have conducted an in-depth analysis of the company's financial statements. Here are the main points I want to convey:
+
+
+[b]Reimbursement:[/b]
+[table]
+[tr]
+    [th]No[/th]
+    [th]Name[/th]
+    [th]Name of activity[/th]
+    [th]Nominal[/th]
+    [th]Proof[/th]
+[/tr]
+${reimTableRows || '[tr][td colspan=5][i]No reimbursement activity[/i][/td][/tr]'}${reimTableRows ? `[tr]
+[cell][/cell]
+[cell][/cell]
+    [td][b]TOTAL[/b][/td]
+    [td][b]$${reimTotalNominal.toLocaleString('en-US')}[/b][/td]
+[cell][/cell]
+[/tr]` : ''}
+[/table]
+
+I have also said that our finance team remains committed to providing the necessary support and information to management in making strategic decisions related to company finances. Thank you for the attention and trust given. If you have any additional questions or requests, please feel free to contact me.
+
+
+[right]Sincerly,
+[img]${sigUrl}[/img]
+${rank}, ${staffName}[/right]
+
+[/divbox][/divbox]`;
+        } else {
+          // Proposal sub-tab
+          bbCode = `[divbox=darkblue][divbox=white]
+
+[center][img]https://news.san-andreas.net/download/file.php?avatar=g69_1637211788.png[/img]
+
+[divbox=darkblue][center][size=150][color=white][b]MONTHLY VICE MANAGER REPORT - ${reportNum}[/b][/color][/size][/center][/divbox]
+[hr][/hr]
+
+Dear, ${targetManager}
+
+Best wishes to all of us,
+
+I the financial supervisor, would like to submit a monthly report regarding the company's financial condition. This report includes important information about the company's financial performance during the previous month.
+During this month, our finance team and I have conducted an in-depth analysis of the company's financial statements. Here are the main points I want to convey:
+
+
+[b]Proposal:[/b]
+[table]
+[tr]
+    [th]No[/th]
+    [th]Name[/th]
+    [th]Name of activity[/th]
+    [th]Nominal[/th]
+    [th]Proof[/th]
+[/tr]
+${propTableRows || '[tr][td colspan=5][i]No proposal activity[/i][/td][/tr]'}${propTableRows ? `[tr]
+[cell][/cell]
+[cell][/cell]
+    [td][b]TOTAL[/b][/td]
+    [td][b]$${propTotalNominal.toLocaleString('en-US')}[/b][/td]
+[cell][/cell]
+[/tr]` : ''}
+[/table]
+
+I have also said that our finance team remains committed to providing the necessary support and information to management in making strategic decisions related to company finances. Thank you for the attention and trust given. If you have any additional questions or requests, please feel free to contact me.
+
+
+[right]Sincerly,
+[img]${sigUrl}[/img]
+${rank}, ${staffName}[/right]
+
+[/divbox][/divbox]`;
+        }
+      }
 
       // Output to Textarea
       document.getElementById('output').value = bbCode;
@@ -465,8 +765,12 @@ ${propText || '[*]No proposal activity'}
     }
 
     /* INIT */
-    addReim();
-    addProp();
+    window.addEventListener('load', () => {
+      loadIdentity();
+      addReim();
+      addProp();
+      generateBBCode();
+    });
   </script>
 
   <style>
@@ -511,7 +815,7 @@ ${propText || '[*]No proposal activity'}
 <footer>
   <div class="max-w-5xl mx-auto px-6 md:px-12 py-8 text-center">
     <p class="text-slate-500 text-sm">
-      &copy; 2026 FINS SANews. Built with <span class="text-red-500">❤</span> by Michael Saylor/Hanif.
+      &copy; 2026 Financial Regulator SANews. Built with <span class="text-red-500">❤</span> by Michael Saylor/Hanif.
     </p>
   </div>
 </footer>
