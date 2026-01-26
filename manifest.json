@@ -1,0 +1,21 @@
+{
+  "name": "FINS Report Generator",
+  "short_name": "FINS",
+  "description": "Activity and Manager Report Generator for Financial Regulator Division",
+  "start_url": "./index%20(2).html",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#6366f1",
+  "icons": [
+    {
+      "src": "https://news.san-andreas.net/download/file.php?avatar=g69_1637211788.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://news.san-andreas.net/download/file.php?avatar=g69_1637211788.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
