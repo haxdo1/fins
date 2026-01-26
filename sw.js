@@ -1,6 +1,6 @@
 const CACHE_NAME = 'fins-generator-v1';
 const ASSETS = [
-    './index%20(2).html',
+    './index.html',
     './manifest.json'
 ];
 
@@ -19,3 +19,4 @@ self.addEventListener('fetch', (event) => {
         })
     );
 });
+
