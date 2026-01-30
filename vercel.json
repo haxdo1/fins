@@ -1,12 +1,14 @@
 {
-    "rewrites": [
+    "functions": {
+        "api/scrape.js": {
+            "memory": 3008,
+            "maxDuration": 60
+        }
+    },
+    "routes": [
         {
-            "source": "/proxy.php",
-            "destination": "/api/proxy"
-        },
-        {
-            "source": "/api/(.*)",
-            "destination": "/api/$1"
+            "src": "/api/scrape",
+            "dest": "/api/scrape.js"
         }
     ]
 }

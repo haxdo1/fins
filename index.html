@@ -1874,34 +1874,26 @@ Keep it immersive for a roleplay setting.`;
         btn.disabled = true;
         btn.innerText = "Syncing...";
 
-        const params = new URLSearchParams();
-        params.append('username', user);
-        params.append('password', pass);
+        const formData = new FormData();
+        formData.append('username', user);
+        formData.append('password', pass);
 
-        const response = await fetch('/api/proxy?action=login', {
+        const response = await fetch('proxy.php?action=login', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          },
-          body: params
+          body: formData
         });
 
         const result = await response.json();
-        console.log("Login Result:", result);
 
         if (result.error) {
-          let extra = "";
-          if (result.debug && result.debug.responseSnippet) {
-            extra = "\n\nServer said: " + result.debug.responseSnippet + "...";
+          let debugMsg = '';
+          if (result.debug) {
+            const d = result.debug;
+            debugMsg = `\n\nDiagnostics:\n- Writable Dir: ${d.dir_writable ? 'Yes' : 'No'}\n- Write Test: ${d.write_test ? 'Pass' : 'Fail'}\n- Response Size: ${d.len} bytes\n- Snippet: ${d.snippet}...`;
           }
-          throw new Error(result.error + extra);
+          throw new Error(result.error + debugMsg);
         }
-
-        if (result.cookies) {
-          localStorage.setItem('forum_cookie', result.cookies);
-        }
-
-        alert("Session Synced! You can now fetch data.");
+        alert("Session Synced! You can now fetch data without manual cookies.");
       } catch (error) {
         console.error(error);
         alert("Login Sync Failed: " + error.message);
@@ -1915,7 +1907,6 @@ Keep it immersive for a roleplay setting.`;
       const urlInput = document.getElementById('scrapeUrl');
       const lines = urlInput.value.split('\n').map(l => l.trim()).filter(l => l.length > 0);
       const btn = document.getElementById('fetchBtn');
-      const forumCookie = localStorage.getItem('forum_cookie') || '';
 
       if (lines.length === 0) {
         alert("Please enter at least one Topic URL.");
@@ -1946,8 +1937,7 @@ Keep it immersive for a roleplay setting.`;
 
           try {
             // Use our proxy with automated session
-            // Passing cookie via query for maximum compatibility with serverless headers
-            const response = await fetch(`/api/proxy?action=fetch&url=${encodeURIComponent(url)}&cookie=${encodeURIComponent(forumCookie)}`);
+            const response = await fetch(`proxy.php?action=fetch&url=${encodeURIComponent(url)}`);
             const data = await response.json();
 
             if (data.error) throw new Error(data.error);
