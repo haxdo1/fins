@@ -1887,6 +1887,7 @@ Keep it immersive for a roleplay setting.`;
         });
 
         const result = await response.json();
+        console.log("Login Result:", result);
 
         if (result.error) {
           throw new Error(result.error);
