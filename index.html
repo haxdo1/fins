@@ -1890,7 +1890,11 @@ Keep it immersive for a roleplay setting.`;
         console.log("Login Result:", result);
 
         if (result.error) {
-          throw new Error(result.error);
+          let extra = "";
+          if (result.debug && result.debug.responseSnippet) {
+            extra = "\n\nServer said: " + result.debug.responseSnippet + "...";
+          }
+          throw new Error(result.error + extra);
         }
 
         if (result.cookies) {
