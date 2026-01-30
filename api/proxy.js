@@ -77,14 +77,20 @@ export default async function handler(req, res) {
                     cookies: combinedCookies.join('; ')
                 });
             } else {
+                // Return parts of the response for debugging if it failed
                 return res.status(401).json({
                     error: 'Login failed. Check credentials.',
                     status: resp2.status,
-                    debug: { token: form_token, sid }
+                    debug: {
+                        token: form_token ? 'Found' : 'Missing',
+                        sid: sid ? 'Found' : 'Missing',
+                        responseSnippet: responseHtml.substring(0, 200)
+                    }
                 });
             }
         } catch (err) {
-            return res.status(500).json({ error: err.message });
+            console.error("Login Error:", err);
+            return res.status(500).json({ error: "Server Error during login: " + err.message });
         }
     }
 
