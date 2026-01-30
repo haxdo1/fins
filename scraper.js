@@ -50,13 +50,13 @@ async function login(username, password) {
     });
     const page = await context.newPage();
 
-    console.log('Navigating to login page...');
+    process.stderr.write('Navigating to login page...\n');
     await page.goto('https://news.san-andreas.net/ucp.php?mode=login', { waitUntil: 'networkidle' });
 
     // Handle potential Cloudflare wait
     await page.waitForTimeout(2000);
 
-    console.log('Filling login form...');
+    process.stderr.write('Filling login form...\n');
     await page.fill('input[name="username"]', username);
     await page.fill('input[name="password"]', password);
     await page.click('input[name="login"]');
@@ -66,7 +66,7 @@ async function login(username, password) {
     const state = await context.storageState();
     fs.writeFileSync(COOKIE_FILE, JSON.stringify(state));
 
-    console.log('Login successful, session saved.');
+    process.stderr.write('Login successful, session saved.\n');
     await browser.close();
     return { success: true };
 }
@@ -79,7 +79,7 @@ async function fetchUrl(url) {
     });
     const page = await context.newPage();
 
-    console.log(`Fetching URL: ${url}`);
+    process.stderr.write(`Fetching URL: ${url}\n`);
     await page.goto(url, { waitUntil: 'networkidle' });
 
     // Give it a bit of time for dynamic content or CF challenges
