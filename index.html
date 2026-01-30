@@ -6,7 +6,7 @@
   <link rel="icon" href="https://news.san-andreas.net/download/file.php?avatar=g69_1637211788.png">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#6366f1">
-  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="FINS Generator">
   <link rel="apple-touch-icon" href="https://news.san-andreas.net/download/file.php?avatar=g69_1637211788.png">
@@ -111,7 +111,8 @@
   </style>
 </head>
 
-<body class="text-slate-300 min-h-screen font-sans selection:bg-indigo-500/30 selection:text-indigo-200 antialiased">
+<body
+  class="text-slate-600 dark:text-slate-300 min-h-screen font-sans selection:bg-indigo-500/30 selection:text-indigo-200 antialiased">
 
   <div class="max-w-5xl mx-auto p-6 md:p-12 relative">
 
@@ -140,20 +141,81 @@
         class="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-2 bg-gradient-to-r from-indigo-500 to-purple-500 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">
         Financial Regulator Division
       </h1>
-      <p class="text-slate-600 dark:text-slate-400 text-lg font-medium">Report Generator
-        <small>v1.0</small>
-      </p>
+      <div class="flex items-center justify-center gap-2">
+        <p class="text-slate-500 dark:text-slate-400 text-lg font-medium">Report Generator</p>
+        <button onclick="toggleSettings()"
+          class="p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors text-slate-400"
+          title="Automation Settings">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- AUTOMATION SETTINGS PANEL (Hidden by default) -->
+    <div id="settingsPanel" class="hidden mb-8 animate-fade-in">
+      <div class="card-panel rounded-2xl p-6 border-indigo-500/20 bg-indigo-500/5">
+        <h3
+          class="text-sm font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          Automation Tools
+        </h3>
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="space-y-4">
+            <div class="space-y-2">
+              <label class="block text-xs font-bold text-slate-500 uppercase">Forum Credentials</label>
+              <div class="grid grid-cols-2 gap-2">
+                <input id="forumUser" type="text" class="w-full p-2.5 rounded-lg input-field text-xs font-mono"
+                  placeholder="Username" oninput="saveIdentity()">
+                <input id="forumPass" type="password" class="w-full p-2.5 rounded-lg input-field text-xs font-mono"
+                  placeholder="Password" oninput="saveIdentity()">
+              </div>
+              <button id="loginBtn" onclick="performForumLogin()"
+                class="w-full py-2 bg-indigo-500 hover:bg-indigo-600 text-white text-[10px] font-bold uppercase rounded-lg transition-colors flex items-center justify-center gap-2">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1m0-11V7" />
+                </svg>
+                Sync Session
+              </button>
+            </div>
+            <p class="text-[10px] text-slate-400">Credentials are stored locally in your browser for automation.</p>
+          </div>
+          <div class="space-y-4">
+            <div class="space-y-2">
+              <label class="block text-xs font-bold text-slate-500 uppercase">Topic URLs to Scrape (One per
+                line)</label>
+              <div class="space-y-2">
+                <textarea id="scrapeUrl"
+                  class="w-full p-2.5 rounded-lg input-field text-[10px] font-mono h-20 resize-none"
+                  placeholder="https://news.san-andreas.net/viewtopic.php?t=..." oninput="saveIdentity()"></textarea>
+                <button onclick="fetchForumData()" id="fetchBtn"
+                  class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-lg text-xs font-bold transition-all shadow-lg active:scale-95 disabled:opacity-50">
+                  Bulk Fetch
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- REPORT TYPE SELECTOR -->
     <div class="mb-8 flex justify-center">
-      <div class="bg-slate-900 p-1.5 rounded-xl border border-slate-800 flex gap-1 shadow-lg">
+      <div
+        class="bg-white dark:bg-slate-900 p-1.5 rounded-xl border border-slate-200 dark:border-slate-800 flex gap-1 shadow-lg transition-all">
         <button id="modeActivity" onclick="switchReportMode('activity')"
           class="px-6 py-2 rounded-lg text-sm font-bold transition-all bg-indigo-600 text-white shadow-md">
           Activity Report
         </button>
         <button id="modeVice" onclick="switchReportMode('vice')"
-          class="px-6 py-2 rounded-lg text-sm font-bold transition-all text-slate-500 hover:text-slate-300">
+          class="px-6 py-2 rounded-lg text-sm font-bold transition-all text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300">
           Manager Report
         </button>
       </div>
@@ -161,18 +223,23 @@
 
     <!-- VICE MANAGER SUB-TAB SELECTOR -->
     <div id="viceSubTabs" class="mb-8 flex justify-center hidden">
-      <div class="bg-slate-800 p-1 rounded-lg border border-slate-700 flex gap-1">
+      <div
+        class="bg-slate-100 dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700 flex gap-1 transition-all">
         <button id="viceReimbursement" onclick="switchViceSubTab('reimbursement')"
           class="px-4 py-1.5 rounded-md text-xs font-semibold transition-all bg-emerald-600 text-white">
           Reimbursement
         </button>
-        <button id="viceProposal" onclick="switchViceSubTab('proposal')"
-          class="px-4 py-1.5 rounded-md text-xs font-semibold transition-all text-slate-400 hover:text-slate-200">
-          Proposal
+        <button id="viceProposalItem" onclick="switchViceSubTab('proposal')"
+          class="px-4 py-1.5 rounded-md text-xs font-semibold transition-all text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200">
+          Internal Proposal
         </button>
         <button id="viceWeekly" onclick="switchViceSubTab('weekly')"
-          class="px-4 py-1.5 rounded-md text-xs font-semibold transition-all text-slate-400 hover:text-slate-200">
+          class="px-4 py-1.5 rounded-md text-xs font-semibold transition-all text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200">
           Weekly Report
+        </button>
+        <button id="viceProposalBonus" onclick="switchViceSubTab('proposal_bonus')"
+          class="px-4 py-1.5 rounded-md text-xs font-semibold transition-all text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200">
+          Salary Proposal
         </button>
       </div>
     </div>
@@ -197,13 +264,13 @@
               <div class="space-y-2">
                 <label for="staffName" class="block text-sm font-medium text-slate-600 dark:text-slate-400">Full
                   Name</label>
-                <input id="staffName" class="w-full p-2.5 rounded-lg input-field text-sm" placeholder="e.g. John Doe"
-                  oninput="saveIdentity(); generateBBCode()">
+                <input id="staffName" class="w-full p-2.5 rounded-lg input-field text-sm"
+                  placeholder="e.g. Michael Saylor" oninput="saveIdentity(); generateBBCode()">
               </div>
               <div class="space-y-2">
                 <label for="rank" class="block text-sm font-medium text-slate-600 dark:text-slate-400">Current
                   Rank</label>
-                <input id="rank" class="w-full p-2.5 rounded-lg input-field text-sm" placeholder="e.g. Senior Officer"
+                <input id="rank" class="w-full p-2.5 rounded-lg input-field text-sm" placeholder="e.g. Expert Staff"
                   oninput="saveIdentity(); generateBBCode()">
               </div>
 
@@ -237,13 +304,31 @@
               <div class="w-1 h-5 bg-emerald-500 rounded-full"></div>
               <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Reimbursements</h2>
             </div>
-            <button onclick="addReim()"
-              class="text-sm font-medium text-emerald-400 hover:text-emerald-300 flex items-center gap-1 transition-colors">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-              </svg>
-              Add Item
-            </button>
+            <div class="flex gap-4">
+              <button onclick="openBulkModal('reim')"
+                class="text-sm font-medium text-slate-500 hover:text-emerald-500 transition-colors flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                </svg>
+                Bulk
+              </button>
+              <button onclick="clearItems('reim')"
+                class="text-sm font-medium text-slate-500 hover:text-red-500 transition-colors flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                Clear
+              </button>
+              <button onclick="addReim()"
+                class="text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 flex items-center gap-1 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                Add Item
+              </button>
+            </div>
           </div>
           <div id="reimContainer" class="space-y-4"></div>
         </section>
@@ -255,13 +340,31 @@
               <div class="w-1 h-5 bg-blue-500 rounded-full"></div>
               <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Proposals</h2>
             </div>
-            <button onclick="addProp()"
-              class="text-sm font-medium text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-              </svg>
-              Add Item
-            </button>
+            <div class="flex gap-4">
+              <button onclick="openBulkModal('prop')"
+                class="text-sm font-medium text-slate-500 hover:text-blue-500 transition-colors flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                </svg>
+                Bulk
+              </button>
+              <button onclick="clearItems('prop')"
+                class="text-sm font-medium text-slate-500 hover:text-red-500 transition-colors flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                Clear
+              </button>
+              <button onclick="addProp()"
+                class="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center gap-1 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                Add Item
+              </button>
+            </div>
           </div>
           <div id="propContainer" class="space-y-4"></div>
         </section>
@@ -306,15 +409,16 @@
                   <option value="Strict & Direct">Strict</option>
                   <option value="Concise & Short">Concise</option>
                 </select>
-                <p class="text-[10px] text-slate-500 px-1">Changes how the AI writes the report paragraphs.</p>
+                <p class="text-[10px] text-slate-400 dark:text-slate-500 px-1">Changes how the AI writes the report
+                  paragraphs.</p>
               </div>
             </div>
 
             <div
-              class="flex flex-col sm:flex-row gap-4 items-end bg-slate-950/50 p-4 rounded-xl border border-slate-800">
+              class="flex flex-col sm:flex-row gap-4 items-end bg-slate-50 dark:bg-slate-950/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
               <div class="flex-1 w-full space-y-2">
                 <label for="geminiKey"
-                  class="block text-xs font-bold text-indigo-400 uppercase tracking-wider hover:underline"><a
+                  class="block text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider hover:underline"><a
                     href="https://aistudio.google.com/app/api-keys" target="_blank">Gemini
                     API Key </a></label>
                 <input id="geminiKey" type="password" class="w-full p-2.5 rounded-lg input-field text-sm"
@@ -357,6 +461,34 @@
           </div>
         </section>
 
+        <!-- PROPOSAL BONUS SECTION -->
+        <section id="proposalBonusSection" class="hidden">
+          <div class="flex justify-between items-end mb-4 px-1">
+            <div class="flex items-center gap-2">
+              <div class="w-1 h-5 bg-indigo-500 rounded-full"></div>
+              <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Salary Bonus Division</h2>
+            </div>
+            <div class="flex gap-4">
+              <button onclick="clearItems('bonus')"
+                class="text-sm font-medium text-slate-500 hover:text-red-500 transition-colors flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                Clear
+              </button>
+              <button onclick="addBonus()"
+                class="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 flex items-center gap-1 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                Add Staff
+              </button>
+            </div>
+          </div>
+          <div id="bonusContainer" class="space-y-4"></div>
+        </section>
+
       </div>
 
       <!-- RIGHT COLUMN (Actions & Output) -->
@@ -364,7 +496,7 @@
 
         <!-- ACTIONS -->
         <div class="card-panel p-5 rounded-xl space-y-4">
-          <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Actions</h3>
+          <h3 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Actions</h3>
 
           <button onclick="generateBBCode()"
             class="w-full btn-primary text-white p-3 rounded-lg font-semibold flex items-center justify-center gap-2">
@@ -375,7 +507,7 @@
           </button>
 
           <button onclick="copyBBCode()"
-            class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white p-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
+            class="w-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white p-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
@@ -389,10 +521,10 @@
           <!-- Tabs -->
           <div class="flex gap-2 px-1">
             <button id="tabSource" onclick="switchTab('source')"
-              class="px-3 py-2 rounded-t-lg bg-slate-950 text-indigo-400 font-bold text-xs uppercase tracking-wider border-t border-x border-slate-800 hover:bg-slate-900 transition">Source
+              class="px-3 py-2 rounded-t-lg bg-slate-100 dark:bg-slate-950 text-indigo-600 dark:text-indigo-400 font-bold text-xs uppercase tracking-wider border-t border-x border-slate-200 dark:border-slate-800 hover:bg-slate-200 dark:hover:bg-slate-900 transition">Source
               Code</button>
             <button id="tabPreview" onclick="switchTab('preview')"
-              class="px-3 py-2 rounded-t-lg bg-transparent text-slate-500 font-bold text-xs uppercase tracking-wider hover:text-slate-300 transition border-t border-x border-transparent">Real
+              class="px-3 py-2 rounded-t-lg bg-transparent text-slate-400 dark:text-slate-500 font-bold text-xs uppercase tracking-wider hover:text-slate-600 dark:hover:text-slate-300 transition border-t border-x border-transparent">Real
               Preview</button>
           </div>
 
@@ -400,12 +532,12 @@
           <div class="relative group">
             <!-- Source Textarea -->
             <textarea id="output"
-              class="w-full h-96 bg-slate-950 border border-slate-800 rounded-b-xl rounded-tr-xl p-4 font-mono text-xs text-slate-400 focus:outline-none focus:border-indigo-500/50 transition-colors resize-none custom-scrollbar shadow-inner block"
+              class="w-full h-96 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-b-xl rounded-tr-xl p-4 font-mono text-xs text-slate-600 dark:text-slate-400 focus:outline-none focus:border-indigo-500/50 transition-colors resize-none custom-scrollbar shadow-inner block"
               readonly placeholder="// Generated code will appear here..."></textarea>
 
             <!-- Preview Div -->
             <div id="preview"
-              class="hidden w-full h-96 bg-slate-50 border border-slate-800 rounded-b-xl rounded-tr-xl p-6 overflow-y-auto custom-scrollbar shadow-inner text-slate-900 font-sans text-sm">
+              class="hidden w-full h-96 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-b-xl rounded-tr-xl p-6 overflow-y-auto custom-scrollbar shadow-inner text-slate-900 dark:text-slate-100 font-sans text-sm">
               <div class="flex flex-col items-center justify-center h-full text-slate-400">
                 <svg class="w-10 h-10 mb-2 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -421,6 +553,44 @@
 
       </div>
 
+    </div>
+  </div>
+
+  <!-- BULK MODAL -->
+  <div id="bulkModal"
+    class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+    <div
+      class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden transform transition-all">
+      <div
+        class="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-950/30">
+        <div>
+          <h3 id="bulkModalTitle" class="text-lg font-bold text-slate-900 dark:text-white">Bulk Add Items</h3>
+          <p id="bulkModalDesc" class="text-xs text-slate-500">Paste your list below</p>
+        </div>
+        <button onclick="closeBulkModal()"
+          class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="p-6 space-y-4">
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-slate-600 dark:text-slate-400">Data List</label>
+          <textarea id="bulkData"
+            class="w-full h-48 p-3 rounded-xl input-field text-sm font-mono custom-scrollbar resize-none"
+            placeholder="Item 1&#10;Item 2&#10;Item 3..."></textarea>
+          <p id="bulkHint" class="text-[10px] text-slate-400 dark:text-slate-500">One item per line. We'll try to parse
+            Name, Week, and Amount if provided.</p>
+        </div>
+        <div class="flex gap-3 pt-2">
+          <button onclick="closeBulkModal()"
+            class="flex-1 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 font-medium transition-all">Cancel</button>
+          <button id="bulkSubmitBtn"
+            class="flex-[2] py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold shadow-lg shadow-indigo-500/20 transition-all">Import
+            Items</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -443,13 +613,13 @@
       const previewDiv = document.getElementById('preview');
 
       if (tab === 'source') {
-        sourceBtn.className = "px-3 py-2 rounded-t-lg bg-slate-950 text-indigo-400 font-bold text-xs uppercase tracking-wider border-t border-x border-slate-800 transition";
-        previewBtn.className = "px-3 py-2 rounded-t-lg bg-transparent text-slate-500 font-bold text-xs uppercase tracking-wider hover:text-slate-300 transition border-t border-x border-transparent";
+        sourceBtn.className = "px-3 py-2 rounded-t-lg bg-slate-100 dark:bg-slate-950 text-indigo-600 dark:text-indigo-400 font-bold text-xs uppercase tracking-wider border-t border-x border-slate-200 dark:border-slate-800 transition";
+        previewBtn.className = "px-3 py-2 rounded-t-lg bg-transparent text-slate-400 dark:text-slate-500 font-bold text-xs uppercase tracking-wider hover:text-slate-600 dark:hover:text-slate-300 transition border-t border-x border-transparent";
         sourceDiv.classList.remove('hidden');
         previewDiv.classList.add('hidden');
       } else {
-        sourceBtn.className = "px-3 py-2 rounded-t-lg bg-transparent text-slate-500 font-bold text-xs uppercase tracking-wider hover:text-slate-300 transition border-t border-x border-transparent";
-        previewBtn.className = "px-3 py-2 rounded-t-lg bg-slate-50 text-indigo-600 font-bold text-xs uppercase tracking-wider border-t border-x border-slate-800 transition";
+        sourceBtn.className = "px-3 py-2 rounded-t-lg bg-transparent text-slate-400 dark:text-slate-500 font-bold text-xs uppercase tracking-wider hover:text-slate-600 dark:hover:text-slate-300 transition border-t border-x border-transparent";
+        previewBtn.className = "px-3 py-2 rounded-t-lg bg-slate-50 dark:bg-slate-950 text-indigo-600 dark:text-indigo-400 font-bold text-xs uppercase tracking-wider border-t border-x border-slate-200 dark:border-slate-800 transition";
         sourceDiv.classList.add('hidden');
         previewDiv.classList.remove('hidden');
       }
@@ -501,7 +671,7 @@
 
       if (mode === 'activity') {
         activityBtn.className = "px-6 py-2 rounded-lg text-sm font-bold transition-all bg-indigo-600 text-white shadow-md";
-        viceBtn.className = "px-6 py-2 rounded-lg text-sm font-bold transition-all text-slate-500 hover:text-slate-300";
+        viceBtn.className = "px-6 py-2 rounded-lg text-sm font-bold transition-all text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300";
         viceFields.forEach(f => f.classList.add('hidden'));
         proposalSection.classList.remove('hidden');
         reimSection.classList.remove('hidden');
@@ -514,7 +684,7 @@
         document.querySelectorAll('.type-field').forEach(f => f.classList.add('sm:col-span-3'));
       } else {
         viceBtn.className = "px-6 py-2 rounded-lg text-sm font-bold transition-all bg-indigo-600 text-white shadow-md";
-        activityBtn.className = "px-6 py-2 rounded-lg text-sm font-bold transition-all text-slate-500 hover:text-slate-300";
+        activityBtn.className = "px-6 py-2 rounded-lg text-sm font-bold transition-all text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300";
         viceFields.forEach(f => f.classList.remove('hidden'));
         viceSubTabs.classList.remove('hidden');
         document.querySelectorAll('.nominal-field').forEach(f => f.classList.remove('hidden'));
@@ -532,21 +702,24 @@
     function switchViceSubTab(subTab) {
       viceSubTab = subTab;
       const reimBtn = document.getElementById('viceReimbursement');
-      const propBtn = document.getElementById('viceProposal');
+      const propBtn = document.getElementById('viceProposalItem');
       const weeklyBtn = document.getElementById('viceWeekly');
       const proposalSection = document.getElementById('proposalSection');
       const reimSection = document.querySelector('#reimContainer').closest('section');
       const weeklySection = document.getElementById('weeklySection');
+      const bonusSection = document.getElementById('proposalBonusSection');
 
       // Reset buttons
-      [reimBtn, propBtn, weeklyBtn].forEach(btn => {
-        btn.className = "px-4 py-1.5 rounded-md text-xs font-semibold transition-all text-slate-400 hover:text-slate-200";
+      [reimBtn, propBtn, weeklyBtn, document.getElementById('viceProposalBonus')].forEach(btn => {
+        if (!btn) return;
+        btn.className = "px-4 py-1.5 rounded-md text-xs font-semibold transition-all text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200";
       });
 
       // Hide all
       reimSection.classList.add('hidden');
       proposalSection.classList.add('hidden');
       weeklySection.classList.add('hidden');
+      bonusSection.classList.add('hidden');
 
       if (subTab === 'reimbursement') {
         reimBtn.className = "px-4 py-1.5 rounded-md text-xs font-semibold transition-all bg-emerald-600 text-white";
@@ -557,62 +730,193 @@
       } else if (subTab === 'weekly') {
         weeklyBtn.className = "px-4 py-1.5 rounded-md text-xs font-semibold transition-all bg-indigo-600 text-white";
         weeklySection.classList.remove('hidden');
+      } else if (subTab === 'proposal_bonus') {
+        document.getElementById('viceProposalBonus').className = "px-4 py-1.5 rounded-md text-xs font-semibold transition-all bg-indigo-600 text-white";
+        bonusSection.classList.remove('hidden');
       }
       generateBBCode();
     }
 
     function saveIdentity() {
-      localStorage.setItem('fins_staffName', document.getElementById('staffName').value);
-      localStorage.setItem('fins_rank', document.getElementById('rank').value);
-      localStorage.setItem('fins_targetManager', document.getElementById('targetManager').value);
-      localStorage.setItem('fins_reportNum', document.getElementById('reportNum').value);
-      localStorage.setItem('fins_signatureUrl', document.getElementById('signatureUrl').value);
-      localStorage.setItem('fins_mode', currentMode);
-      localStorage.setItem('fins_geminiKey', document.getElementById('geminiKey').value);
+      const state = {
+        staffName: document.getElementById('staffName').value,
+        rank: document.getElementById('rank').value,
+        targetManager: document.getElementById('targetManager').value,
+        reportNum: document.getElementById('reportNum').value,
+        signatureUrl: document.getElementById('signatureUrl').value,
+        mode: currentMode,
+        geminiKey: document.getElementById('geminiKey').value,
+        newMembers: document.getElementById('newMembers').value,
+        transferMembers: document.getElementById('transferMembers').value,
+        aiSummary: document.getElementById('aiSummary').value,
+        aiReport: document.getElementById('aiReport').value,
+        aiCondition: document.getElementById('aiCondition').value,
+        aiConstraints: document.getElementById('aiConstraints').value,
+        additionalInfo: document.getElementById('additionalInfo').value,
+        reportDate: document.getElementById('reportDate').value,
+        reportTone: document.getElementById('reportTone').value,
+        theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
+        forumUser: document.getElementById('forumUser').value,
+        forumPass: document.getElementById('forumPass').value,
+        scrapeUrl: document.getElementById('scrapeUrl').value,
+        reims: [],
+        props: [],
+        bonuses: []
+      };
 
-      // Weekly Report fields
-      localStorage.setItem('fins_newMembers', document.getElementById('newMembers').value);
-      localStorage.setItem('fins_transferMembers', document.getElementById('transferMembers').value);
-      localStorage.setItem('fins_aiSummary', document.getElementById('aiSummary').value);
-      localStorage.setItem('fins_aiReport', document.getElementById('aiReport').value);
-      localStorage.setItem('fins_aiCondition', document.getElementById('aiCondition').value);
-      localStorage.setItem('fins_aiConstraints', document.getElementById('aiConstraints').value);
-      localStorage.setItem('fins_additionalInfo', document.getElementById('additionalInfo').value);
-      localStorage.setItem('fins_reportDate', document.getElementById('reportDate').value);
-      localStorage.setItem('fins_reportTone', document.getElementById('reportTone').value);
-      localStorage.setItem('fins_theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+      // Save Reims
+      document.querySelectorAll('#reimContainer > div').forEach(card => {
+        state.reims.push({
+          name: card.querySelector('.person').value,
+          week: card.querySelector('.week-num').value,
+          nominal: card.querySelector('.nominal').value,
+          received: card.querySelector('.received').value,
+          accepted: card.querySelector('.accepted').value,
+          fund: card.querySelector('.fund').value,
+          proof: card.querySelector('.proof') ? card.querySelector('.proof').value : ''
+        });
+      });
+
+      // Save Props
+      document.querySelectorAll('#propContainer > div').forEach(card => {
+        state.props.push({
+          manager: card.querySelector('.manager').value,
+          type: card.querySelector('.type').value,
+          nominal: card.querySelector('.nominal') ? card.querySelector('.nominal').value : '',
+          received: card.querySelector('.received').value,
+          accepted: card.querySelector('.accepted').value,
+          fund: card.querySelector('.fund').value,
+          proof: card.querySelector('.proof') ? card.querySelector('.proof').value : ''
+        });
+      });
+
+      // Save Bonuses
+      document.querySelectorAll('#bonusContainer > div').forEach(card => {
+        state.bonuses.push({
+          name: card.querySelector('.bonus-name').value,
+          pos: card.querySelector('.bonus-pos').value,
+          url: card.querySelector('.bonus-url').value,
+          totalReport: card.querySelector('.bonus-report').value,
+          estimate: card.querySelector('.bonus-estimate').value,
+          total: card.querySelector('.bonus-total').value,
+          tasks: card.querySelector('.bonus-tasks') ? card.querySelector('.bonus-tasks').value : ''
+        });
+      });
+
+      localStorage.setItem('fins_state_v2', JSON.stringify(state));
     }
 
     function loadIdentity() {
-      const savedName = localStorage.getItem('fins_staffName');
-      const savedRank = localStorage.getItem('fins_rank');
-      const savedTarget = localStorage.getItem('fins_targetManager');
-      const savedNum = localStorage.getItem('fins_reportNum');
-      const savedSig = localStorage.getItem('fins_signatureUrl');
-      const savedMode = localStorage.getItem('fins_mode');
-      const savedKey = localStorage.getItem('fins_geminiKey');
-      const savedTheme = localStorage.getItem('fins_theme');
+      const saved = localStorage.getItem('fins_state_v2');
+      if (!saved) return;
 
-      if (savedName) document.getElementById('staffName').value = savedName;
-      if (savedRank) document.getElementById('rank').value = savedRank;
-      if (savedTarget) document.getElementById('targetManager').value = savedTarget;
-      if (savedNum) document.getElementById('reportNum').value = savedNum;
-      if (savedSig) document.getElementById('signatureUrl').value = savedSig;
-      if (savedMode) switchReportMode(savedMode);
-      if (savedKey) document.getElementById('geminiKey').value = savedKey;
+      const state = JSON.parse(saved);
 
-      if (savedTheme === 'light') {
+      if (state.staffName) document.getElementById('staffName').value = state.staffName;
+      if (state.rank) document.getElementById('rank').value = state.rank;
+      if (state.targetManager) document.getElementById('targetManager').value = state.targetManager;
+      if (state.reportNum) document.getElementById('reportNum').value = state.reportNum;
+      if (state.signatureUrl) document.getElementById('signatureUrl').value = state.signatureUrl;
+      if (state.mode) switchReportMode(state.mode);
+      if (state.geminiKey) document.getElementById('geminiKey').value = state.geminiKey;
+      if (state.forumUser) document.getElementById('forumUser').value = state.forumUser;
+      if (state.forumPass) document.getElementById('forumPass').value = state.forumPass;
+      if (state.scrapeUrl) document.getElementById('scrapeUrl').value = state.scrapeUrl;
+
+      if (state.theme === 'light') {
         document.documentElement.classList.remove('dark');
       } else {
         document.documentElement.classList.add('dark');
       }
 
-      // Weekly Report fields load
+      // Weekly Report fields
       const fields = ['newMembers', 'transferMembers', 'aiSummary', 'aiReport', 'aiCondition', 'aiConstraints', 'additionalInfo', 'reportDate', 'reportTone'];
       fields.forEach(f => {
-        const val = localStorage.getItem('fins_' + f);
-        if (val) document.getElementById(f).value = val;
+        if (state[f] !== undefined) document.getElementById(f).value = state[f];
       });
+
+      // Load Reims
+      if (state.reims && state.reims.length > 0) {
+        document.getElementById('reimContainer').innerHTML = '';
+        state.reims.forEach(data => addReim(data));
+      }
+
+      // Load Props
+      if (state.props && state.props.length > 0) {
+        document.getElementById('propContainer').innerHTML = '';
+        state.props.forEach(data => addProp(data));
+      }
+
+      // Load Bonuses
+      if (state.bonuses && state.bonuses.length > 0) {
+        document.getElementById('bonusContainer').innerHTML = '';
+        state.bonuses.forEach(data => addBonus(data));
+      }
+    }
+
+    /* ===== BULK ACTIONS ===== */
+    let currentBulkTarget = 'reim';
+    function openBulkModal(target) {
+      currentBulkTarget = target;
+      const modal = document.getElementById('bulkModal');
+      const title = document.getElementById('bulkModalTitle');
+      const hint = document.getElementById('bulkHint');
+      const dataArea = document.getElementById('bulkData');
+
+      dataArea.value = '';
+      modal.classList.remove('hidden');
+
+      if (target === 'reim') {
+        title.innerText = "Bulk Add Reimbursements";
+        hint.innerText = "Format: Name or Name - Week - Amount. Example: Ismail Rothschild - 12 - 500";
+      } else {
+        title.innerText = "Bulk Add Proposals";
+        hint.innerText = "Format: Type or Type - Manager - Amount. Example: CC Salary - Jason Sullivan - 20000";
+      }
+
+      document.getElementById('bulkSubmitBtn').onclick = () => {
+        const lines = dataArea.value.split('\n').filter(l => l.trim());
+        lines.forEach(line => {
+          const parts = line.split('-').map(p => p.trim());
+          if (target === 'reim') {
+            addReim({
+              name: parts[0] || '',
+              week: parts[1] || '',
+              nominal: parts[2] || ''
+            });
+          } else {
+            addProp({
+              type: parts[0] || '',
+              manager: parts[1] || '',
+              nominal: parts[2] || ''
+            });
+          }
+        });
+        closeBulkModal();
+        saveIdentity();
+        generateBBCode();
+      };
+    }
+
+    function closeBulkModal() {
+      document.getElementById('bulkModal').classList.add('hidden');
+    }
+
+    function clearItems(target) {
+      if (!confirm(`Are you sure you want to clear all ${target === 'reim' ? 'reimbursements' : target === 'prop' ? 'proposals' : 'bonus items'}?`)) return;
+      document.getElementById(target + 'Container').innerHTML = '';
+      if (target === 'reim') {
+        reimCount = 0;
+        addReim();
+      } else if (target === 'prop') {
+        propCount = 0;
+        addProp();
+      } else {
+        bonusCount = 0;
+        addBonus();
+      }
+      saveIdentity();
+      generateBBCode();
     }
 
     /* ===== PARSER ===== */
@@ -630,11 +934,15 @@
         .replace(/\[color=#FFFFFF\](.*?)\[\/color\]/gs, '<span style="color:white">$1</span>')
         .replace(/\[color=white\](.*?)\[\/color\]/gs, '<span style="color:white">$1</span>')
         .replace(/\[divbox=darkblue\]/g, '<div class="bg-blue-900 p-4 rounded-lg text-white mb-2 shadow-sm start-divbox">')
+        .replace(/\[divbox=blue\]/g, '<div class="bg-blue-600 p-4 rounded-lg text-white mb-2 shadow-sm start-divbox">')
+        .replace(/\[divbox=Black\]/g, '<div class="bg-black p-4 rounded-lg text-white mb-2 shadow-sm start-divbox">')
+        .replace(/\[divbox=White\]/g, '<div class="bg-white p-4 rounded-lg text-slate-900 mb-2 border border-slate-200 shadow-sm start-divbox">')
         .replace(/\[divbox=white\]/g, '<div class="bg-white p-4 rounded-lg text-slate-900 mb-2 border border-slate-200 shadow-sm start-divbox">')
         .replace(/\[\/divbox\]/g, '</div>')
         .replace(/\[hr\]\[\/hr\]/g, '<hr class="my-4 border-slate-300">')
         .replace(/\[secspoiler=(.*?)\]/g, '<details class="mb-2 bg-slate-50 border border-slate-200 rounded overflow-hidden"><summary class="bg-slate-200 p-2 font-semibold cursor-pointer text-slate-700 hover:bg-slate-300 transition">$1</summary><div class="p-3">')
         .replace(/\[\/secspoiler\]/g, '</div></details>')
+        .replace(/\[justify\](.*?)\[\/justify\]/gs, '<div style="text-align: justify;">$1</div>')
         .replace(/\[list=1\]/g, '<ol class="list-decimal pl-5 space-y-1">')
         .replace(/\[\/list\]/g, '</ol>')
         .replace(/\[\*\]/g, '<li class="marker:text-slate-400">')
@@ -655,13 +963,13 @@
     /* ===== CARD TEMPLATES ===== */
     let reimCount = 0, propCount = 0;
 
-    function addReim() {
+    function addReim(data = {}) {
       reimCount++;
       const html = `
   <div class="card-panel rounded-xl p-5 relative animate-fade-in group">
-    <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-800">
-      <h3 class="font-medium text-emerald-500 text-sm">Reimbursement #${reimCount}</h3>
-      <button onclick="this.closest('.card-panel').remove(); generateBBCode()" class="text-slate-600 hover:text-red-400 transition-colors" title="Remove">
+    <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-200 dark:border-slate-800">
+      <h3 class="font-medium text-emerald-600 dark:text-emerald-500 text-sm">Reimbursement #${reimCount}</h3>
+      <button onclick="this.closest('.card-panel').remove(); saveIdentity(); generateBBCode()" class="text-slate-600 hover:text-red-400 transition-colors" title="Remove">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
       </button>
     </div>
@@ -669,34 +977,34 @@
       <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
         <div class="sm:col-span-2">
           <label class="block text-xs font-medium text-slate-500 mb-1.5 pl-1">Name</label>
-          <input class="w-full p-2.5 rounded-lg input-field sm:text-sm person" placeholder="e.g. Ismail Rothschild" oninput="generateBBCode()">
+          <input class="w-full p-2.5 rounded-lg input-field sm:text-sm person" placeholder="e.g. Ismail Rothschild" value="${data.name || ''}" oninput="saveIdentity(); generateBBCode()">
         </div>
         <div>
           <label class="block text-xs font-medium text-slate-500 mb-1.5 pl-1">Week</label>
-          <input type="number" class="w-full p-2.5 rounded-lg input-field sm:text-sm week-num" placeholder="Auto" oninput="generateBBCode()">
+          <input type="number" class="w-full p-2.5 rounded-lg input-field sm:text-sm week-num" placeholder="Auto" value="${data.week || ''}" oninput="saveIdentity(); generateBBCode()">
         </div>
         <div class="nominal-field ${currentMode === 'activity' ? 'hidden' : ''}">
           <label class="block text-xs font-medium text-slate-500 mb-1.5 pl-1">Nominal ($)</label>
-          <input type="number" class="w-full p-2.5 rounded-lg input-field sm:text-sm nominal" placeholder="e.g. 500" oninput="generateBBCode()">
+          <input type="number" class="w-full p-2.5 rounded-lg input-field sm:text-sm nominal" placeholder="e.g. 500" value="${data.nominal || ''}" oninput="saveIdentity(); generateBBCode()">
         </div>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 activity-links ${currentMode === 'vice' ? 'hidden' : ''}">
         <div>
            <label class="block text-xs font-medium text-slate-500 mb-1.5 pl-1">Received URL</label>
-           <input class="w-full p-2.5 rounded-lg input-field sm:text-sm received" placeholder="https://..." oninput="generateBBCode()">
+           <input class="w-full p-2.5 rounded-lg input-field sm:text-sm received" placeholder="https://..." value="${data.received || ''}" oninput="saveIdentity(); generateBBCode()">
         </div>
         <div>
            <label class="block text-xs font-medium text-slate-500 mb-1.5 pl-1">Accepted URL</label>
-           <input class="w-full p-2.5 rounded-lg input-field sm:text-sm accepted" placeholder="https://..." oninput="generateBBCode()">
+           <input class="w-full p-2.5 rounded-lg input-field sm:text-sm accepted" placeholder="https://..." value="${data.accepted || ''}" oninput="saveIdentity(); generateBBCode()">
         </div>
         <div>
            <label class="block text-xs font-medium text-slate-500 mb-1.5 pl-1">Funds Given URL</label>
-           <input class="w-full p-2.5 rounded-lg input-field sm:text-sm fund" placeholder="https://..." oninput="generateBBCode()">
+           <input class="w-full p-2.5 rounded-lg input-field sm:text-sm fund" placeholder="https://..." value="${data.fund || ''}" oninput="saveIdentity(); generateBBCode()">
         </div>
       </div>
       <div class="vice-links ${currentMode === 'activity' ? 'hidden' : ''}">
          <label class="block text-xs font-medium text-slate-500 mb-1.5 pl-1">Proof URL</label>
-         <input class="w-full p-2.5 rounded-lg input-field sm:text-sm proof" placeholder="https://..." oninput="generateBBCode()">
+         <input class="w-full p-2.5 rounded-lg input-field sm:text-sm proof" placeholder="https://..." value="${data.proof || ''}" oninput="saveIdentity(); generateBBCode()">
       </div>
     </div>
   </div>`;
@@ -704,13 +1012,13 @@
       generateBBCode();
     }
 
-    function addProp() {
+    function addProp(data = {}) {
       propCount++;
       const html = `
   <div class="card-panel rounded-xl p-5 relative animate-fade-in group">
-    <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-800">
-      <h3 class="font-medium text-blue-500 text-sm">Proposal #${propCount}</h3>
-      <button onclick="this.closest('.card-panel').remove(); generateBBCode()" class="text-slate-600 hover:text-red-400 transition-colors" title="Remove">
+    <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-200 dark:border-slate-800">
+      <h3 class="font-medium text-blue-600 dark:text-blue-500 text-sm">Proposal #${propCount}</h3>
+      <button onclick="this.closest('.card-panel').remove(); saveIdentity(); generateBBCode()" class="text-slate-600 hover:text-red-400 transition-colors" title="Remove">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
       </button>
     </div>
@@ -718,39 +1026,268 @@
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
          <div class="manager-field">
             <label class="block text-xs font-medium text-slate-500 mb-1.5 pl-1">Manager</label>
-            <input class="w-full p-2.5 rounded-lg input-field sm:text-sm manager" placeholder="e.g. Jason Sullivan" oninput="generateBBCode()">
+            <input class="w-full p-2.5 rounded-lg input-field sm:text-sm manager" placeholder="e.g. Jason Sullivan" value="${data.manager || ''}" oninput="saveIdentity(); generateBBCode()">
          </div>
          <div class="type-field">
             <label class="block text-xs font-medium text-slate-500 mb-1.5 pl-1">Type</label>
-            <input class="w-full p-2.5 rounded-lg input-field sm:text-sm type" placeholder="e.g. CC Salary Mar 2025" oninput="generateBBCode()">
+            <input class="w-full p-2.5 rounded-lg input-field sm:text-sm type" placeholder="e.g. CC Salary Mar 2025" value="${data.type || ''}" oninput="saveIdentity(); generateBBCode()">
          </div>
          <div class="nominal-field ${currentMode === 'activity' ? 'hidden' : ''}">
            <label class="block text-xs font-medium text-slate-500 mb-1.5 pl-1">Nominal ($)</label>
-           <input type="number" class="w-full p-2.5 rounded-lg input-field sm:text-sm nominal" placeholder="e.g. 20900" oninput="generateBBCode()">
+           <input type="number" class="w-full p-2.5 rounded-lg input-field sm:text-sm nominal" placeholder="e.g. 20900" value="${data.nominal || ''}" oninput="saveIdentity(); generateBBCode()">
          </div>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 activity-links ${currentMode === 'vice' ? 'hidden' : ''}">
         <div>
            <label class="block text-xs font-medium text-slate-500 mb-1.5 pl-1">Received URL</label>
-           <input class="w-full p-2.5 rounded-lg input-field sm:text-sm received" placeholder="https://..." oninput="generateBBCode()">
+           <input class="w-full p-2.5 rounded-lg input-field sm:text-sm received" placeholder="https://..." value="${data.received || ''}" oninput="saveIdentity(); generateBBCode()">
         </div>
         <div>
            <label class="block text-xs font-medium text-slate-500 mb-1.5 pl-1">Accepted URL</label>
-           <input class="w-full p-2.5 rounded-lg input-field sm:text-sm accepted" placeholder="https://..." oninput="generateBBCode()">
+           <input class="w-full p-2.5 rounded-lg input-field sm:text-sm accepted" placeholder="https://..." value="${data.accepted || ''}" oninput="saveIdentity(); generateBBCode()">
         </div>
         <div>
            <label class="block text-xs font-medium text-slate-500 mb-1.5 pl-1">Funds Given URL</label>
-           <input class="w-full p-2.5 rounded-lg input-field sm:text-sm fund" placeholder="https://..." oninput="generateBBCode()">
+           <input class="w-full p-2.5 rounded-lg input-field sm:text-sm fund" placeholder="https://..." value="${data.fund || ''}" oninput="saveIdentity(); generateBBCode()">
         </div>
       </div>
       <div class="vice-links ${currentMode === 'activity' ? 'hidden' : ''}">
          <label class="block text-xs font-medium text-slate-500 mb-1.5 pl-1">Proof URL</label>
-         <input class="w-full p-2.5 rounded-lg input-field sm:text-sm proof" placeholder="https://..." oninput="generateBBCode()">
+         <input class="w-full p-2.5 rounded-lg input-field sm:text-sm proof" placeholder="https://..." value="${data.proof || ''}" oninput="saveIdentity(); generateBBCode()">
       </div>
     </div>
   </div>`;
       propContainer.insertAdjacentHTML('beforeend', html);
       generateBBCode();
+    }
+
+    let bonusCount = 0;
+    function addBonus(data = {}) {
+      bonusCount++;
+      const html = `
+  <div class="card-panel rounded-xl p-5 relative animate-fade-in group bonus-item">
+    <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-200 dark:border-slate-800">
+      <h3 class="font-medium text-indigo-600 dark:text-indigo-400 text-sm">Staff Bonus #${bonusCount}</h3>
+      <button onclick="this.closest('.card-panel').remove(); saveIdentity(); generateBBCode()" class="text-slate-600 hover:text-red-400 transition-colors" title="Remove">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+      </button>
+    </div>
+    <div class="space-y-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-medium text-slate-500 mb-1.5 pl-1">Name</label>
+          <input class="w-full p-2.5 rounded-lg input-field sm:text-sm bonus-name" placeholder="e.g. Muriel Dickin" value="${data.name || ''}" oninput="saveIdentity(); generateBBCode()">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-500 mb-1.5 pl-1">Position</label>
+          <select class="w-full p-2.5 rounded-lg input-field sm:text-sm bonus-pos" onchange="autoFillBonus(this); saveIdentity(); generateBBCode()">
+            <option value="General Manager" ${data.pos === 'General Manager' ? 'selected' : ''}>General Manager</option>
+            <option value="Manager" ${data.pos === 'Manager' ? 'selected' : ''}>Manager</option>
+            <option value="Vice Manager" ${data.pos === 'Vice Manager' ? 'selected' : ''}>Vice Manager</option>
+            <option value="Accountant" ${data.pos === 'Accountant' ? 'selected' : ''}>Accountant</option>
+            <option value="Expert Staff" ${data.pos === 'Expert Staff' ? 'selected' : ''}>Expert Staff</option>
+            <option value="Advanced Staff" ${data.pos === 'Advanced Staff' ? 'selected' : ''}>Advanced Staff</option>
+            <option value="Trainee Staff" ${data.pos === 'Trainee Staff' ? 'selected' : ''}>Trainee Staff</option>
+            <option value="Novice Staff" ${data.pos === 'Novice Staff' ? 'selected' : ''}>Novice Staff</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="bonus-tasks-field">
+         <label class="block text-xs font-medium text-slate-500 mb-1.5 pl-1">Tasks (Static only)</label>
+         <textarea class="w-full p-2.5 rounded-lg input-field sm:text-sm bonus-tasks h-20 resize-none" placeholder="Task description..." oninput="saveIdentity(); generateBBCode()">${data.tasks || ''}</textarea>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 mb-3 bonus-staff-only">
+        <div class="sm:col-span-12">
+           <label class="block text-xs font-medium text-slate-500 mb-1.5 pl-1">Activity Report URL</label>
+           <div class="flex gap-2">
+             <input class="flex-1 p-2.5 rounded-lg input-field sm:text-sm bonus-url" placeholder="https://..." value="${data.url || ''}" oninput="saveIdentity()">
+             <button onclick="scrapeStaffBonus(this)" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 rounded-lg text-xs font-bold transition-all">Scrape</button>
+           </div>
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+        <div class="sm:col-span-4 bonus-staff-only">
+           <label class="block text-xs font-medium text-slate-500 mb-1.5 pl-1">Total Report</label>
+           <input class="w-full p-2.5 rounded-lg input-field sm:text-sm bonus-report" placeholder="e.g. 5 Reimb..." value="${data.totalReport || ''}" oninput="saveIdentity(); generateBBCode()">
+        </div>
+        <div class="sm:col-span-4 bonus-estimate-container">
+           <label class="block text-xs font-medium text-slate-500 mb-1.5 pl-1">Estimate</label>
+           <input class="w-full p-2.5 rounded-lg input-field sm:text-sm bonus-estimate" placeholder="$300 x ..." value="${data.estimate || ''}" oninput="updateTotalFromEstimate(this); saveIdentity(); generateBBCode()">
+        </div>
+        <div class="sm:col-span-4 bonus-total-container">
+           <label class="block text-xs font-medium text-slate-500 mb-1.5 pl-1">Total Bonus ($)</label>
+           <input type="number" class="w-full p-2.5 rounded-lg input-field sm:text-sm bonus-total font-bold text-indigo-600 dark:text-indigo-400" placeholder="0" value="${data.total || ''}" oninput="saveIdentity(); generateBBCode()">
+        </div>
+      </div>
+    </div>
+  </div>`;
+      bonusContainer.insertAdjacentHTML('beforeend', html);
+      // Run auto-fill on add if pos is selected or after adding
+      setTimeout(() => {
+        const lastCard = bonusContainer.lastElementChild;
+        autoFillBonus(lastCard.querySelector('.bonus-pos'));
+      }, 0);
+      generateBBCode();
+    }
+
+    function autoFillBonus(select) {
+      const card = select.closest('.card-panel');
+      const pos = select.value;
+      const tasks = card.querySelector('.bonus-tasks');
+      const staffOnly = card.querySelectorAll('.bonus-staff-only');
+      const total = card.querySelector('.bonus-total');
+      const estimate = card.querySelector('.bonus-estimate');
+      const tasksField = card.querySelector('.bonus-tasks-field');
+      const estimateContainer = card.querySelector('.bonus-estimate-container');
+      const totalContainer = card.querySelector('.bonus-total-container');
+
+      if (pos.includes('Staff')) {
+        staffOnly.forEach(el => el.classList.remove('hidden'));
+        tasksField.classList.add('hidden');
+        totalContainer.classList.remove('hidden');
+        estimateContainer.className = "sm:col-span-4 bonus-estimate-container";
+      } else {
+        staffOnly.forEach(el => el.classList.add('hidden'));
+        tasksField.classList.remove('hidden'); // Restore layout with tasks
+        totalContainer.classList.add('hidden'); // Keep total hidden as estimate + estimate is handled
+        estimateContainer.className = "sm:col-span-12 bonus-estimate-container";
+
+        if (pos === 'General Manager') {
+          tasks.value = "Supervise division heads and unit heads, make several updates on the website, and be responsible for the division’s operational activities.";
+          estimate.value = "$0";
+          total.value = 0;
+        } else if (pos === 'Manager') {
+          tasks.value = "The manager in reviewing staff reports, preparing weekly reports, and leading the division’s operations.";
+          estimate.value = "$5,000";
+          total.value = 5000;
+        } else if (pos === 'Vice Manager') {
+          tasks.value = "Oversee the processing of incoming reimbursement and proposal provide support to staff in managing them and Assist in conducting interviews and training for division recruitment.";
+          estimate.value = "$4,000 + $4,000";
+          total.value = 8000;
+        } else if (pos === 'Accountant') {
+          tasks.value = "Provide assistance in preparing financial cash flow reports in spreadsheet format and Assist in conducting interviews for division recruitment.";
+          estimate.value = "$0";
+          total.value = 0;
+        }
+      }
+    }
+
+    function updateTotalFromEstimate(input) {
+      const card = input.closest('.card-panel');
+      const totalField = card.querySelector('.bonus-total');
+      const val = input.value;
+
+      if (val.includes('+')) {
+        const parts = val.split('+');
+        let sum = 0;
+        parts.forEach(p => {
+          const num = parseInt(p.replace(/[^0-9]/g, '')) || 0;
+          sum += num;
+        });
+        totalField.value = sum;
+      } else if (val.includes('x')) {
+        // If it's a staff estimate like $300 x 9
+        const parts = val.toLowerCase().split('x');
+        if (parts.length === 2) {
+          const n1 = parseInt(parts[0].replace(/[^0-9]/g, '')) || 0;
+          const n2 = parseInt(parts[1].replace(/[^0-9]/g, '')) || 0;
+          totalField.value = n1 * n2;
+        }
+      }
+    }
+
+    async function scrapeStaffBonus(btn) {
+      const card = btn.closest('.card-panel');
+      const url = card.querySelector('.bonus-url').value.trim();
+      const reportField = card.querySelector('.bonus-report');
+      const estimateField = card.querySelector('.bonus-estimate');
+      const totalField = card.querySelector('.bonus-total');
+      const pos = card.querySelector('.bonus-pos').value;
+
+      if (!url) {
+        alert("Please enter an Activity Report URL first.");
+        return;
+      }
+
+      try {
+        btn.disabled = true;
+        btn.innerText = "Scanning...";
+
+        const response = await fetch(`proxy.php?action=fetch&url=${encodeURIComponent(url)}`);
+        const data = await response.json();
+        if (data.error) throw new Error(data.error);
+
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(data.html, 'text/html');
+
+        // Target the report content strictly to avoid picking up site navigation or notifications
+        const firstPost = doc.querySelector('.postbody .content') ||
+          doc.querySelector('.post .content') ||
+          doc.querySelector('.content');
+        if (!firstPost) throw new Error("Could not find report content.");
+
+        let reimCount = 0;
+        let propCount = 0;
+
+        // 1. Try to find lists within specifically labeled containers (Spoilers or Divs)
+        const allLists = firstPost.querySelectorAll('ol, ul');
+        allLists.forEach(list => {
+          let current = list.parentElement;
+          // Look up for a container that has the keyword (Reimbursement/Proposal)
+          while (current && current !== firstPost) {
+            const header = current.innerText.split('\n')[0].toLowerCase();
+            if (header.includes('reimbursment') || header.includes('reimbursement')) {
+              reimCount = list.querySelectorAll('li').length;
+              return;
+            } else if (header.includes('proposal')) {
+              propCount = list.querySelectorAll('li').length;
+              return;
+            }
+            // Limit search depth to avoid matching too far up
+            if (current.tagName === 'DIV' && current.style.border) break;
+            current = current.parentElement;
+          }
+        });
+
+        // 2. Fallback: If keywords weren't found in headers, just take the first two <ol> in the post
+        // (Activity reports almost always use two [list=1] blocks for these sections)
+        if (reimCount === 0 && propCount === 0) {
+          const lists = firstPost.querySelectorAll('ol');
+          if (lists.length >= 2) {
+            reimCount = lists[0].querySelectorAll('li').length;
+            propCount = lists[1].querySelectorAll('li').length;
+          } else if (lists.length === 1) {
+            const text = firstPost.innerText.toLowerCase();
+            if (text.includes('reimbursement') || text.includes('reimbursment')) {
+              reimCount = lists[0].querySelectorAll('li').length;
+            } else if (text.includes('proposal')) {
+              propCount = lists[0].querySelectorAll('li').length;
+            }
+          }
+        }
+
+        const totalItems = reimCount + propCount;
+        reportField.value = `${reimCount} Reimbursement and ${propCount} Proposal Reports`;
+        estimateField.value = `$300 x ${totalItems}`;
+        totalField.value = totalItems * 300;
+
+        // Extra: Try to scrape name
+        const nameMatch = firstPost.innerText.match(/Name\s*:\s*(.*?)(\n|$)/i);
+        if (nameMatch) card.querySelector('.bonus-name').value = nameMatch[1].trim();
+
+        saveIdentity();
+        generateBBCode();
+        alert(`Scraped successfully!\nFound ${reimCount} reimbursements and ${propCount} proposals.`);
+      } catch (err) {
+        console.error(err);
+        alert("Scrape failed: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Scrape";
+      }
     }
 
     /* ===== GENERATE ===== */
@@ -808,9 +1345,9 @@
 
         // Activity Mode TEXT
         propText +=
-          bbItem(received, `[PROPOSAL] ${type} - RECEIVE`) +
-          bbItem(accepted, `[PROPOSAL] ${type} - ACCEPTED`) +
-          bbItem(fund, `[PROPOSAL] ${type} - FUNDS HAVE BEEN GIVEN`);
+          bbItem(received, `[PROPOSAL] ${manager} - ${type} - RECEIVE`) +
+          bbItem(accepted, `[PROPOSAL] ${manager} - ${type} - ACCEPTED`) +
+          bbItem(fund, `[PROPOSAL] ${manager} - ${type} - FUNDS HAVE BEEN GIVEN`);
 
         // Vice Manager Mode TABLE ROW
         propTableRows += `[tr]
@@ -863,7 +1400,7 @@ ${propText || '[*]No proposal activity'}
         if (viceSubTab === 'reimbursement') {
           bbCode = `[divbox=darkblue][divbox=white]
 
-[center][img]https://news.san-andreas.net/download/file.php?avatar=g69_1637211788.png[/img]
+[center][img]https://news.san-andreas.net/download/file.php?avatar=g69_1637211788.png[/img][/center]
 
 [divbox=darkblue][center][size=150][color=white][b]MONTHLY VICE MANAGER REPORT - ${reportNum}[/b][/color][/size][/center][/divbox]
 [hr][/hr]
@@ -906,7 +1443,7 @@ ${rank}, ${staffName}[/right]
           // Proposal sub-tab
           bbCode = `[divbox=darkblue][divbox=white]
 
-[center][img]https://news.san-andreas.net/download/file.php?avatar=g69_1637211788.png[/img]
+[center][img]https://news.san-andreas.net/download/file.php?avatar=g69_1637211788.png[/img][/center]
 
 [divbox=darkblue][center][size=150][color=white][b]MONTHLY VICE MANAGER REPORT - ${reportNum}[/b][/color][/size][/center][/divbox]
 [hr][/hr]
@@ -984,6 +1521,127 @@ Sincerly,
 [b]${rank},[/b]
 ${staffName}[/right]
 [/divbox]`;
+        } else if (viceSubTab === 'proposal_bonus') {
+          // PROPOSAL SALARY BONUS
+          let reportRows = '';
+          let salaryRows = '';
+          let grandTotal = 0;
+          let counter = 0;
+
+          document.querySelectorAll('#bonusContainer > div').forEach(card => {
+            counter++;
+            const name = card.querySelector('.bonus-name').value || 'Unknown';
+            const pos = card.querySelector('.bonus-pos').value || 'Staff';
+            const totalReport = card.querySelector('.bonus-report').value || '-';
+            const estimate = card.querySelector('.bonus-estimate').value || '$0.00';
+            const total = parseInt(card.querySelector('.bonus-total').value) || 0;
+            const tasks = card.querySelector('.bonus-tasks').value || '-';
+            const url = card.querySelector('.bonus-url').value || '#';
+
+            grandTotal += total;
+
+            // Table 1 Row
+            let reportEntry = totalReport;
+            if (pos.includes('Staff')) {
+              reportEntry = `[url=${url}]${totalReport}[/url] and Assist in conducting interviews and training for division recruitment.`;
+            } else if (pos === 'General Manager' || pos === 'Manager') {
+              reportEntry = `Controlling Financial Regulator Division`;
+              if (pos === 'Manager') reportEntry = `[url=${url}]Manager - ${name} ${reportNum}[/url] and Controlling Financial Regulator Division`;
+            } else if (pos === 'Vice Manager') {
+              reportEntry = `[url=${url}]Vice Manager - ${name} ${reportNum}[/url] and Assist in conducting interviews and training for division recruitment.`;
+            } else if (pos === 'Accountant') {
+              reportEntry = `[url=${url}]Making the Spreadsheet[/url] and Assist in conducting interviews and training for division recruitment.`;
+            }
+
+            reportRows += `[tr]
+    [td]${name}[/td]
+    [td]${pos}[/td]
+    [td]${reportEntry}[/td]
+[/tr]
+`;
+
+            // Table 2 Row
+            salaryRows += `[tr]
+    [td][center]${counter}[/center][/td]
+    [td][center]${name}[/center][/td]
+    [td]${pos.includes('Staff') ? `Reimbursement and Proposal Reports and Assist in conducting interviews and training for division recruitment.` : tasks}[/td]
+    [td][center]${estimate}[/center][/td]
+    [td][center]$${total.toLocaleString('en-US')}[/center][/td]
+[/tr]
+`;
+          });
+
+          bbCode = `[divbox=blue]
+[hr][/hr]
+[center][img]https://news.san-andreas.net/download/file.php?avatar=g69_1637211788.png[/img][/center]
+
+[hr][/hr]
+[divbox=Black][color=#FFFFFF][center][size=150][b]PROPOSAL Financial Regulator Detailed Jobdesk[/b][/size][/center][/color][/divbox]
+[hr][/hr]
+[divbox=White]
+[b]A. Background[/b]
+[justify]Financial Regulator is a division engaged in corporate finance and management. The main tasks of the Financial Team are receiving, reviewing, reporting and taking action on proposal submissions and reimbursement. The Financial Team also pays attention to the company's cash flow and conducts financial analysis in order to achieve company goals. The forms of reports issued by the Financial Team are statements of financial position, income statements, cash flow statements as well as company ledgers and general journals. This division has two sub-divisions within it, that is :
+
+[list=1]
+[*][b]Proposal Section:[/b]
+Proposal subdivision is the place to process incoming and outgoing proposals, both proposals for an activity and proposals for divisional routine salaries in the San Andreas News Network.
+
+[*][b]Reimbursement Section:[/b]
+Reimbursement is the act of compensating someone for out-of-pocket expenses by giving them an amount equal to what was spent.
+[/list][/justify]
+
+
+[b]B. Activity Name[/b]
+In the form of bonuses for Financial Regulator staff.
+
+[b]C. Purpose[/b]
+Our goal is to submit a proposal to request funds related to the Financial Team Salary, which has been running since February until now. Attached to the Activity Report.
+
+[b]D. Time and Place[/b]
+[b]Day and Date[/b]: Every day
+[b]Time[/b] : Operational Hours 09:00 to 21:00
+[b]Venue[/b] : SANews Agency/Headquater
+
+[b]E. Activity Report[/b]
+[left]
+[hr][/hr]
+[table]
+[tr]
+    [th]NAME[/th]
+    [th]POSITION[/th]
+    [th]TOTAL REPORT[/th]
+[/tr]
+${reportRows}
+[/table]
+[color=#FFFFFF]Spacer[/color]
+[hr][/hr]
+[divbox=Black][color=#FFFFFF][center][size=150][b]PROPOSAL SALARY BONUS DIVISION[/b][/size][/center][/color][/divbox]
+[hr][/hr]
+[center]
+[table]
+[tr]
+    [td][b][center]No[/center][/b][/td]
+    [td][b][center]Name[/center][/b][/td]
+    [td][b][center]Task(s)[/center][/b][/td]
+    [td][b][center]Estimate[/center][/b][/td]
+    [td][b][center]Total[/center][/b][/td]
+[/tr]
+${salaryRows}[tr]
+    [td][/td]
+    [td][/td]
+    [td][/td]
+    [td][b]TOTAL[/b][/td]
+    [td][b]$${grandTotal.toLocaleString('en-US')}[/b][/td]
+[/tr]
+[/table]
+[/center]
+[hr][/hr]
+[b]E. Closing[/b]
+[justify]Thus this proposal is made so that it can be used as necessary. That's all and thank you, and also hope to get a positive response & support from related parties.
+[right][size=110][font=Verdana]${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}${sigUrl ? `[color=#FFFFFF][/color]` : ''}[/font][/size][/right]
+
+[/divbox]
+[/divbox]`;
         }
       }
 
@@ -1019,14 +1677,26 @@ ${staffName}[/right]
     window.addEventListener('load', () => {
       loadIdentity();
 
+      // Migrating old data if needed or initializing defaults
+      if (document.getElementById('reimContainer').children.length === 0) {
+        addReim();
+      }
+      if (document.getElementById('propContainer').children.length === 0) {
+        addProp();
+      }
+
       // Auto-set Date if empty
       const reportDateInput = document.getElementById('reportDate');
       if (reportDateInput && !reportDateInput.value) {
         reportDateInput.value = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
       }
 
-      addReim();
-      addProp();
+      // Auto-set Report Number if empty
+      const reportNumInput = document.getElementById('reportNum');
+      if (reportNumInput && !reportNumInput.value) {
+        reportNumInput.value = '#' + (new Date().getMonth() + 1);
+      }
+
       generateBBCode();
 
       // Register Service Worker
@@ -1069,27 +1739,35 @@ ${staffName}[/right]
         if (t && m) props.push(`${t} by ${m} ($${n})`);
       });
 
-      const prompt = `You are ${staffName}, ${rank}.
-Write a professional weekly report for the Financial Regulator division in a San Andreas roleplay context.
-Use a **${tone}** tone of voice throughout the report.
+      const prompt = `You are ${staffName}, ${rank} in the Financial Regulator division.
+Write a professional weekly report in Indonesian (Bahasa Indonesia) for a San Andreas roleplay context (GTA V RP / SA-MP).
+Your tone must be **${tone}**.
 
-Details:
-- Summary Highlights: ${summary || 'Regular operations, no significant issues.'}
-- Reimbursements processed: ${reims.join(', ') || 'None'}
-- Proposals handled: ${props.join(', ') || 'None'}
+CONTEXT:
+Your job is to oversee division finances, manage reimbursements, and process budget proposals. You ensure every dollar is accounted for and that all transactions follow the Standard Operating Procedure (SOP).
 
-Please provide the content in Indonesian language.
-The output MUST be in this exact format with markers:
+WEEKLY DATA:
+- Summary/Highlights: ${summary || 'Kegiatan operasional rutin, tidak ada kendala signifikan.'}
+- Reimbursements processed: ${reims.join(', ') || 'Tidak ada aktivitas reimbursement.'}
+- Proposals handled: ${props.join(', ') || 'Tidak ada aktivitas proposal.'}
+
+INSTRUCTIONS:
+1. Use high-quality Indonesian. If tone is "Professional", use formal words like "menginstruksikan", "menindaklanjuti", "evaluasi". If "Friendly", be more approachable but still respectful.
+2. In the [REPORT] section, describe how you managed the budget and transaction requests this week. Mention that everything has been logged and verified against the SOP.
+3. In [CONDITION], describe the team's discipline in submitting reports and the overall "sehat" (healthy) state of the division budget.
+4. In [CONSTRAINTS], mention specific obstacles if provided in the summary, or state "Tidak ada kendala yang menghambat kinerja divisi minggu ini."
+
+OUTPUT FORMAT (MUST USE THESE MARKERS):
 [REPORT]
-(A paragraph about the activities this week, focusing on how proposals and reimbursements was handled smoothly following SOP)
+(Tulis 1-2 paragraf mengenai aktivitas keuangan minggu ini)
 
 [CONDITION]
-(A sentence about the division's current operational status, team coordination, and SOP compliance)
+(Tulis 1 kalimat mengenai status operasional dan kepatuhan SOP)
 
 [CONSTRAINTS]
-(A sentence about any issues like inactivity due to holidays, structure changes, or technical delays, OR state that there are no constraints)
+(Tulis 1 kalimat mengenai kendala atau "Tidak ada")
 
-Keep it realistic for a financial oversight division.`;
+Keep it immersive for a roleplay setting.`;
 
       try {
         btn.disabled = true;
@@ -1173,6 +1851,359 @@ Keep it realistic for a financial oversight division.`;
         btn.disabled = false;
         btn.classList.remove('opacity-50', 'cursor-not-allowed');
         btn.innerHTML = `<svg class="w-5 h-5 ai-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg> AI Automate`;
+      }
+    }
+
+    /* ===== FORUM SCRAPER ===== */
+    function toggleSettings() {
+      const panel = document.getElementById('settingsPanel');
+      panel.classList.toggle('hidden');
+    }
+
+    async function performForumLogin() {
+      const user = document.getElementById('forumUser').value.trim();
+      const pass = document.getElementById('forumPass').value.trim();
+      const btn = document.getElementById('loginBtn');
+
+      if (!user || !pass) {
+        alert("Please enter both Username and Password.");
+        return;
+      }
+
+      try {
+        btn.disabled = true;
+        btn.innerText = "Syncing...";
+
+        const formData = new FormData();
+        formData.append('username', user);
+        formData.append('password', pass);
+
+        const response = await fetch('proxy.php?action=login', {
+          method: 'POST',
+          body: formData
+        });
+
+        const result = await response.json();
+
+        if (result.error) {
+          let debugMsg = '';
+          if (result.debug) {
+            const d = result.debug;
+            debugMsg = `\n\nDiagnostics:\n- Writable Dir: ${d.dir_writable ? 'Yes' : 'No'}\n- Write Test: ${d.write_test ? 'Pass' : 'Fail'}\n- Response Size: ${d.len} bytes\n- Snippet: ${d.snippet}...`;
+          }
+          throw new Error(result.error + debugMsg);
+        }
+        alert("Session Synced! You can now fetch data without manual cookies.");
+      } catch (error) {
+        console.error(error);
+        alert("Login Sync Failed: " + error.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Sync Session";
+      }
+    }
+
+    async function fetchForumData() {
+      const urlInput = document.getElementById('scrapeUrl');
+      const lines = urlInput.value.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+      const btn = document.getElementById('fetchBtn');
+
+      if (lines.length === 0) {
+        alert("Please enter at least one Topic URL.");
+        return;
+      }
+
+      try {
+        btn.disabled = true;
+        let successCount = 0;
+        let failCount = 0;
+
+        // Clear empty placeholders if we are about to fetch
+        const reimCards = document.querySelectorAll('#reimContainer > div');
+        const propCards = document.querySelectorAll('#propContainer > div');
+
+        if (reimCards.length === 1 && !reimCards[0].querySelector('.person').value && !reimCards[0].querySelector('.nominal').value) {
+          document.getElementById('reimContainer').innerHTML = '';
+          reimCount = 0;
+        }
+        if (propCards.length === 1 && !propCards[0].querySelector('.manager').value && !propCards[0].querySelector('.type').value) {
+          document.getElementById('propContainer').innerHTML = '';
+          propCount = 0;
+        }
+
+        for (let i = 0; i < lines.length; i++) {
+          const url = lines[i];
+          btn.innerText = `Fetching ${i + 1}/${lines.length}...`;
+
+          try {
+            // Use our proxy with automated session
+            const response = await fetch(`proxy.php?action=fetch&url=${encodeURIComponent(url)}`);
+            const data = await response.json();
+
+            if (data.error) throw new Error(data.error);
+            if (!data.html) throw new Error("No content received");
+
+            // Deep parser for SANews format
+            if (data.html.includes('id="login"') || data.html.includes('name="login"')) {
+              console.warn("Fetcher: Session expired or not logged in.");
+              if (confirm("Your forum session has expired. Would you like to re-sync now?")) {
+                await performForumLogin();
+                // Retry this URL after login
+                i--;
+                continue;
+              }
+              break; // Stop bulk fetch if user cancels sync
+            }
+
+            const success = parseForumContent(data.html, url);
+            if (success) successCount++;
+            else failCount++;
+
+          } catch (err) {
+            console.error(`Error fetching ${url}:`, err);
+            failCount++;
+          }
+
+          // Small delay between requests to avoid server strain/blocks
+          if (lines.length > 1 && i < lines.length - 1) {
+            await new Promise(r => setTimeout(r, 800));
+          }
+        }
+
+        if (successCount > 0) {
+          alert(`Sync Complete!\nFound items in ${successCount} topics.\nFailed: ${failCount}`);
+        } else {
+          alert("No items found. Make sure you are logged in on the forum and the URLs are correct.");
+        }
+      } catch (error) {
+        console.error(error);
+        alert("Error: " + error.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Bulk Fetch";
+      }
+    }
+
+    function parseForumContent(html, sourceUrl) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      let foundAny = false;
+
+      const titleText = doc.querySelector('.topic-title')?.innerText || doc.querySelector('h2 a')?.innerText || doc.title || '';
+      const isProposalTopic = titleText.toLowerCase().includes('proposal');
+      const isReimbursementTopic = titleText.toLowerCase().includes('reimbursement');
+
+      // 1. Detect SANews Topic Page
+      const topicLinks = doc.querySelectorAll('.post');
+      if (topicLinks.length > 0 || doc.body.innerHTML.includes('postbody')) {
+        let data = {
+          name: '',
+          week: '',
+          nominal: '',
+          received: '',
+          accepted: '',
+          fund: '',
+          proof: '',
+          type: '',
+          manager: ''
+        };
+
+        // Title Parsing
+        if (isReimbursementTopic) {
+          const reimMatch = titleText.match(/Reimbursement\s*[-]*\s*(.*?)\s*\(Week\s*(\d+)/i) ||
+            titleText.match(/Reimbursement\s*[-]*\s*(.*?)\s*-\s*Week\s*(\d+)/i);
+          if (reimMatch) {
+            data.name = reimMatch[1].replace(/^[- ]+/, '').trim();
+            data.week = reimMatch[2].trim();
+          }
+        } else if (isProposalTopic) {
+          // More robust proposal title parsing
+          // Pattern: [PROPOSAL] Manager - Type [STATUS]
+          const cleanTitle = titleText.replace(/\[.*?\]/g, '').replace(/[\[\]]/g, '').trim();
+
+          if (cleanTitle.includes(' - ')) {
+            const subParts = cleanTitle.split(' - ');
+            data.manager = subParts[0].trim();
+            data.type = subParts.slice(1).join(' - ').trim();
+          } else {
+            // Fallback: try regex on the original title but strip results
+            const propMatch = titleText.match(/Proposal\s*[-]*\s*([\]\s-]*)(.*?)\s*-\s*(.*?)($|[\[\(])/i);
+            if (propMatch) {
+              data.manager = propMatch[2].trim();
+              data.type = propMatch[3].trim();
+            } else {
+              data.type = cleanTitle;
+            }
+          }
+        }
+
+        const posts = doc.querySelectorAll('.post, .postbody');
+        posts.forEach((post, index) => {
+          const contentText = post.innerText;
+          const contentHtml = post.innerHTML;
+
+          let postUrl = sourceUrl;
+          const postLinks = post.querySelectorAll('a[href*="p="]');
+          let postId = '';
+
+          for (let link of postLinks) {
+            const href = link.getAttribute('href');
+            const match = href.match(/[?&]p=(\d+)/);
+            if (match) {
+              postId = match[1];
+              break;
+            }
+          }
+
+          if (postId) {
+            postUrl = `https://news.san-andreas.net/viewtopic.php?p=${postId}#p${postId}`;
+          }
+
+          // Field Extraction
+          if (isReimbursementTopic) {
+            if (!data.name) {
+              const m = contentText.match(/Name\s*:\s*(.*?)(\n|$)/i);
+              if (m) data.name = m[1].trim();
+            }
+            if (!data.week) {
+              const m = contentText.match(/Week\s*:\s*(\d+)/i) || contentText.match(/Week\s*:\s*(.*?)(\n|$)/i);
+              if (m) data.week = m[1].trim();
+            }
+            // Title fallback
+            if (!data.name && titleText.includes('(')) {
+              data.name = titleText.split('(')[0].replace(/Reimbursement/i, '').replace(/^[- ]+/, '').trim();
+            }
+          } else {
+            if (!data.manager) {
+              const m = contentText.match(/Manager\s*:\s*(.*?)(\n|$)/i) ||
+                contentText.match(/(?:Applicant|Employee|Name)\s*:\s*(.*?)(\n|$)/i);
+              if (m) data.manager = m[1].replace(/[\[\]]/g, '').trim();
+            }
+            if (!data.type) {
+              const m = contentText.match(/Type\s*:\s*(.*?)(\n|$)/i) ||
+                contentText.match(/(?:Topic|Event|Reason|Proposal)\s*:\s*(.*?)(\n|$)/i);
+              if (m) data.type = m[1].trim();
+            }
+          }
+
+          // Improved Nominal Extraction (Targeting the final TOTAL row)
+          let nominalVal = '';
+          // Try specific "TOTAL" in table pattern - looking for the LAST occurrence in the HTML
+          const tableMatches = [...contentHtml.matchAll(/TOTAL.*?<\/td>\s*<td[^>]*>.*?\$(\d[\d,.]*)/gis)];
+          if (tableMatches.length > 0) {
+            // Take the last match since the user specified it's at the "very end"
+            nominalVal = tableMatches[tableMatches.length - 1][1];
+          } else {
+            // Generic match as fallback
+            const genericNom = contentText.match(/(?:Refund|Amount|Total|Budget|Total Refund)\s*[:]?\s*\$?(\d[\d,.]*)/i) ||
+              contentText.match(/\$?(\d[\d,.]*)/);
+            if (genericNom) nominalVal = genericNom[1];
+          }
+
+          if (nominalVal && !data.nominal) {
+            // Smarter clean: remove commas, then take part before dot (ignore cents)
+            data.nominal = nominalVal.replace(/,/g, '').split('.')[0].replace(/[^0-9]/g, '');
+          }
+
+          // Status Detection
+          const upperHtml = contentHtml.toUpperCase();
+          if (upperHtml.includes('RECEIVED')) {
+            if (!data.received) data.received = postUrl;
+          }
+          if (upperHtml.includes('ACCEPTED')) {
+            if (!data.accepted) data.accepted = postUrl;
+          }
+          if (upperHtml.includes('FUNDS HAVE BEEN GIVEN')) {
+            if (!data.fund) data.fund = postUrl;
+
+            // The user wants the topic link as proof for both Reimbursements and Proposals
+            data.proof = sourceUrl.split('&p=')[0].split('#')[0]; // Use clean topic URL
+          }
+        });
+
+        if (isReimbursementTopic && (data.name || data.nominal)) {
+          addReim(data);
+          foundAny = true;
+        } else if (isProposalTopic && (data.type || data.nominal)) {
+          addProp(data);
+          foundAny = true;
+        }
+      }
+
+      // 2. Forum List (multiple topics)
+      if (!foundAny) {
+        const listLinks = doc.querySelectorAll('.topictitle');
+        listLinks.forEach(link => {
+          const title = link.innerText;
+          const url = new URL(link.getAttribute('href'), sourceUrl).href;
+
+          const cleanTitle = title.replace(/\[.*?\]/g, '').replace(/[\[\]]/g, '').trim();
+          if (cleanTitle.toLowerCase().includes('reimbursement')) {
+            const m = cleanTitle.match(/Reimbursement\s*[-]*\s*(.*?)\s*-\s*Week\s*(\d+)/i) ||
+              cleanTitle.match(/Reimbursement\s*[-]*\s*(.*?)\s*\(Week\s*(\d+)/i);
+            if (m) {
+              addReim({
+                name: m[1].trim(),
+                week: m[2].trim(),
+                fund: url
+              });
+              foundAny = true;
+            }
+          } else if (cleanTitle.toLowerCase().includes('proposal') || title.toLowerCase().includes('proposal')) {
+            if (cleanTitle.includes(' - ')) {
+              const subParts = cleanTitle.split(' - ');
+              addProp({
+                manager: subParts[0].trim(),
+                type: subParts.slice(1).join(' - ').trim(),
+                fund: url
+              });
+              foundAny = true;
+            } else {
+              addProp({
+                type: cleanTitle,
+                fund: url
+              });
+              foundAny = true;
+            }
+          }
+        });
+      }
+
+      if (foundAny) {
+        saveIdentity();
+        generateBBCode();
+        return true;
+      } else {
+        // Last resort: Search entire HTML for signatures
+        console.log("Parser: Falling back to global search...");
+        const allText = doc.body.innerText;
+
+        // Look for "Name: ... Week: ... Amount: ..." sequence
+        const lines = allText.split('\n');
+        let potentialReim = { name: '', week: '', nominal: '' };
+
+        lines.forEach(line => {
+          const textLine = line.trim();
+          if (!textLine) return;
+
+          if (textLine.match(/Name\s*:\s*(.*)/i)) potentialReim.name = textLine.match(/Name\s*:\s*(.*)/i)[1].trim();
+          if (textLine.match(/Week\s*:\s*(\d+)/i)) potentialReim.week = textLine.match(/Week\s*:\s*(\d+)/i)[1].trim();
+          if (textLine.match(/(?:Refund|Amount|Total|Budget)\s*:\s*\$?(\d+)/i)) potentialReim.nominal = textLine.match(/(?:Refund|Amount|Total|Budget)\s*:\s*\$?(\d+)/i)[1].trim();
+
+          // If we found at least a name and something else, count it
+          if (potentialReim.name && (potentialReim.week || potentialReim.nominal)) {
+            addReim(potentialReim);
+            potentialReim = { name: '', week: '', nominal: '' }; // Reset for next
+            foundAny = true;
+          }
+        });
+
+        if (foundAny) {
+          saveIdentity();
+          generateBBCode();
+          return true;
+        }
+        return false;
       }
     }
   </script>
