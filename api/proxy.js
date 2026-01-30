@@ -37,6 +37,9 @@ export default async function handler(req, res) {
 
             let cookies = getCookies(resp1);
 
+            // Wait 1 second (phpBB security sometimes rejects if too fast)
+            await new Promise(r => setTimeout(r, 1000));
+
             // 2. Perform Login
             let loginUrl = 'https://news.san-andreas.net/ucp.php?mode=login';
             if (sid) loginUrl += `&sid=${sid}`;
