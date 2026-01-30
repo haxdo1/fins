@@ -29,8 +29,13 @@ export default async function handler(req, res) {
             const creation_time = html1.match(/name="creation_time" value="(.*?)"/)?.[1] || '';
             const sid = html1.match(/name="sid" value="(.*?)"/i)?.[1] || '';
 
-            // Get initial cookies
-            let cookies = resp1.headers.getSetCookie?.() || [];
+            // Get initial cookies and extract only name=value parts
+            const getCookies = (resp) => {
+                const setCookies = resp.headers.getSetCookie?.() || [];
+                return setCookies.map(c => c.split(';')[0]);
+            };
+
+            let cookies = getCookies(resp1);
 
             // 2. Perform Login
             let loginUrl = 'https://news.san-andreas.net/ucp.php?mode=login';
@@ -59,7 +64,7 @@ export default async function handler(req, res) {
             });
 
             const responseHtml = await resp2.text();
-            const loginCookies = resp2.headers.getSetCookie?.() || [];
+            const loginCookies = getCookies(resp2);
             const combinedCookies = [...cookies, ...loginCookies];
 
             // Success Check
